@@ -1,0 +1,24 @@
+﻿@model LoginVM
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Войти</h1>
+<div class="text-danger" asp-validation-summary="All"></div>
+
+<form asp-action="Index" method="post">
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" type="password"/>
+    </div>
+    <div class="form-group">
+        Запомнить меня? <input type="checkbox" asp-for="Remember" />
+    </div>
+    <button class="btn btn-primary" type="submit">Войти</button>
+</form>
