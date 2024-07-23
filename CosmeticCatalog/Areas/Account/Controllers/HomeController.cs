@@ -13,25 +13,33 @@ namespace CosmeticCatalog.Areas.Account.Controllers
     [Area("Account")]
     public class HomeController : Controller
     {
-        private UserManager<AppUser> userManager;
+        private UserManager<AppUser> _userManager;
 
         public HomeController(UserManager<AppUser> userManager)
         {
-            this.userManager = userManager;
+            _userManager = userManager;
         }
 
         [Authorize]
         [Route("{area}")]
         public async Task<IActionResult> Index()
         {
-            var user = await userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user != null)
             {
                 var userVM = new UserVM
                 {
                     Name = user.UserName ?? "NoName",
-                    Email = user.Email ?? "NoEmail"
+                    Email = user.Email ?? "NoEmail",
                 };
+                
+                // Добавляет роли в VM.
+                var roles = await _userManager.GetRolesAsync(user);
+                foreach (var r in roles)
+                {
+                    userVM.Roles.Add(r);
+                }
+
                 return View(userVM);
             }
             return new NotFoundResult();
@@ -55,7 +63,7 @@ namespace CosmeticCatalog.Areas.Account.Controllers
                     UserName = userModel.Name,
                     Email = userModel.Email
                 };
-                IdentityResult result = await userManager.CreateAsync(appUser, userModel.Password);
+                IdentityResult result = await _userManager.CreateAsync(appUser, userModel.Password);
 
                 if (result.Succeeded) return RedirectToAction("Index");
                 else

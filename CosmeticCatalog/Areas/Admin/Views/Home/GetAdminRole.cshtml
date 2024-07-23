@@ -1,0 +1,13 @@
+﻿@model AppUser
+<h3>@Model.UserName</h3>
+<h3>@Model.Email</h3>
+<br />
+<p>
+    Роль администратора может быть только у одного пользователя. Только он может
+    выдавать роли остальным пользователям.
+</p>
+<br />
+<form method="post" asp-route-userid=@Model.Id>
+    <button type="submit" class="btn btn-primary">Получить роль</button>
+</form>
+
