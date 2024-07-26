@@ -1,0 +1,29 @@
+﻿@model UserVM
+
+<h3>@Model.Name</h3>
+<h3>@Model.Email</h3>
+@if (Model.Roles.Count > 0)
+{
+    string roles = "Roles: ";
+    @foreach (var r in Model.Roles)
+    {
+        roles += r + " ";
+    }
+    <h3>@roles</h3>
+}
+
+
+@if (!Model.Roles.Contains("Admin") && !Model.Roles.Contains("Moderator"))
+{
+    <br />
+    <form method="post" asp-action="GiveModeratorRole" asp-route-userId="@Model.Id">
+        <button type="submit" class="btn btn-primary">Назначить модератором</button>
+    </form>
+}
+@if (!Model.Roles.Contains("Admin") && Model.Roles.Contains("Moderator"))
+{
+    <br />
+    <form method="post" asp-action="RemoveModeratorRole" asp-route-userId="@Model.Id">
+        <button type="submit" class="btn btn-danger">Забрать роль модератора</button>
+    </form>
+}

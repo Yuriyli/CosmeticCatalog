@@ -1,5 +1,6 @@
 ﻿using CosmeticCatalog.Data;
 using CosmeticCatalog.Models;
+using CosmeticCatalog.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -36,11 +37,29 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}")]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // TODO: Создать список пользователей, пагинацию,
-            // отдельные методы для просмотра отдельнх пользоавателей и выдачи прав модератора
-            return View();
+            // Если в проекте станет много пользователей(маловероятно), сделать пагинацию и поиск
+            var appUsers = _userManager.Users;
+            var usersVM = new List<UserVM>();
+
+            foreach (var appU in appUsers)
+            {
+                var userVM = new UserVM()
+                {
+                    Id = appU.Id,
+                    Name = appU.UserName,
+                    Email = appU.Email
+                };
+                var roles = await _userManager.GetRolesAsync(appU);
+                foreach (var r in roles)
+                {
+                    userVM.Roles.Add(r);
+                }
+                usersVM.Add(userVM);
+            }
+
+            return View(usersVM);
         }
 
         /// <summary>
@@ -82,7 +101,11 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
             return View(user);
         }
 
-        // Получение прав администратора при нажатие кнопки в \Admin\Views\Home\GetAdminRole.cshtml
+        /// <summary>
+        /// Получение прав администратора при нажатие кнопки в \Admin\Views\Home\GetAdminRole.cshtml
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
+        /// <returns>Перенаправляет в случае успеха на страницу Account/Index</returns>
         [Route("{area}/Getadminrole")]
         [HttpPost]
         [Authorize]
@@ -112,7 +135,6 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
                 }
                 return new NotFoundResult();
             }
-
             else
             {
                 string info = "Пользователю - ";
@@ -122,6 +144,96 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
                 _logger.LogInformation(info);
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        /// <summary>
+        /// Информация о пользователе и выдача прав
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
+        /// <returns></returns>
+        [Route("{area}/EditUser")]
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditUser(string userId)
+        {
+            var result = new UserVM();
+            var appUser = await _userManager.FindByIdAsync(userId);
+            if (appUser == null) return new NotFoundResult();
+
+            result.Id = appUser.Id;
+            result.Name = appUser.UserName;
+            result.Email = appUser.Email;
+
+            var roles = await _userManager.GetRolesAsync(appUser);
+            foreach (var r in roles)
+            {
+                result.Roles.Add(r);
+            }
+
+            return View(result);
+        }
+
+
+        /// <summary>
+        /// Добавляет роль модератора пользователю
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
+        /// <returns>Возвращает на страницу редактирования</returns>
+        [Route("{area}/GiveModeratorRole")]
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GiveModeratorRole(string userId)
+        {
+            var appUser = await _userManager.FindByIdAsync(userId);
+            if (appUser == null) return new NotFoundResult();
+
+            var isInRole = await _userManager.IsInRoleAsync(appUser, "Moderator");
+            if (isInRole)
+            {
+                _logger.LogCritical($"Невозможно назначить на роль. Пользователь {appUser.UserName} уже имеет роль модератора");
+                return new BadRequestResult();
+            }
+
+            var result = await _userManager.AddToRoleAsync(appUser, "Moderator");
+            if (result.Succeeded)
+            {
+                string text = String.Empty;
+                text += "Пользователю " + appUser.UserName + "(" + appUser.Id + ") добавлена роль модератора";
+                _logger.LogInformation(text);
+            }
+
+            return RedirectToAction("EditUser", new { userId = userId });
+        }
+
+        /// <summary>
+        /// Забирает роль модератора
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
+        /// <returns>Возвращает на страницу редактирования</returns>
+        [Route("{area}/RemoveModeratorRole")]
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveModeratorRole(string userId)
+        {
+            var appUser = await _userManager.FindByIdAsync(userId);
+            if (appUser == null) return new NotFoundResult();
+
+            var isInRole = await _userManager.IsInRoleAsync(appUser, "Moderator");
+            if (!isInRole)
+            {
+                _logger.LogCritical($"Невозможно лишить роли пользователя {appUser.UserName}, роль отсутсвует");
+                return new BadRequestResult();
+            }
+
+            var result = await _userManager.RemoveFromRoleAsync(appUser, "Moderator");
+            if (result.Succeeded)
+            {
+                string text = String.Empty;
+                text += "У пользователя " + appUser.UserName + "(" + appUser.Id + ") убрана роль модератора";
+                _logger.LogInformation(text);
+            }
+
+            return RedirectToAction("EditUser", new { userId = userId });
         }
 
     }

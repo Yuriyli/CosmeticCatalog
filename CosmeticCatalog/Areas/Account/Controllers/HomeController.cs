@@ -14,10 +14,12 @@ namespace CosmeticCatalog.Areas.Account.Controllers
     public class HomeController : Controller
     {
         private UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public HomeController(UserManager<AppUser> userManager)
+        public HomeController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [Authorize]
@@ -65,7 +67,11 @@ namespace CosmeticCatalog.Areas.Account.Controllers
                 };
                 IdentityResult result = await _userManager.CreateAsync(appUser, userModel.Password);
 
-                if (result.Succeeded) return RedirectToAction("Index");
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignOutAsync();
+                    return RedirectToAction("Index","Login");
+                }
                 else
                 {
                     foreach (IdentityError error in result.Errors)

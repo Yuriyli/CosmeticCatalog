@@ -11,13 +11,13 @@ namespace CosmeticCatalog.Areas.Account.Controllers
     [Area("Account")]
     public class LoginController : Controller
     {
-        private UserManager<AppUser> userManager;
-        private SignInManager<AppUser> signInManager;
+        private UserManager<AppUser> _userManager;
+        private SignInManager<AppUser> _signInManager;
 
-        public LoginController(UserManager<AppUser> userMgr, SignInManager<AppUser> signinMgr)
+        public LoginController(UserManager<AppUser> userManager, SignInManager<AppUser> signinManager)
         {
-            userManager = userMgr;
-            signInManager = signinMgr;
+            _userManager = userManager;
+            _signInManager = signinManager;
         }
 
         [Route("{area}/Login")]
@@ -36,11 +36,11 @@ namespace CosmeticCatalog.Areas.Account.Controllers
         {
             if (ModelState.IsValid)
             {
-                AppUser? appUser = await userManager.FindByNameAsync(loginVM.Name);
+                AppUser? appUser = await _userManager.FindByNameAsync(loginVM.Name);
                 if (appUser != null)
                 {
-                    await signInManager.SignOutAsync();
-                    var result = await signInManager.PasswordSignInAsync(
+                    await _signInManager.SignOutAsync();
+                    var result = await _signInManager.PasswordSignInAsync(
                         appUser, loginVM.Password, loginVM.Remember, false);
 
                     if (result.Succeeded)
@@ -57,7 +57,7 @@ namespace CosmeticCatalog.Areas.Account.Controllers
         [Route("{area}/Logout")]
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
     }
