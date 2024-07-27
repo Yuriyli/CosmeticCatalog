@@ -1,6 +1,6 @@
-namespace CosmeticCatalog.Models
+namespace CosmeticCatalog.ViewModels
 {
-    public class ErrorViewModel
+    public class ErrorVM
     {
         public string? RequestId { get; set; }
 
