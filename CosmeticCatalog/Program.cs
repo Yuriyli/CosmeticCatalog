@@ -1,5 +1,6 @@
 using CosmeticCatalog.Data;
 using CosmeticCatalog.Models;
+using CosmeticCatalog.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ builder.Services.Configure<IdentityOptions>(opts =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<ModeratorService>();
 
 var app = builder.Build();
 

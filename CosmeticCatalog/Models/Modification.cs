@@ -15,7 +15,7 @@
         public int Id { get; set; }
         public required AppUser AppUser { get; set; }
         public required DateTime DateTime { get; set; }
-        public ModificationType ModificationType { get; set; }
+        public required ModificationType ModificationType { get; set; }
         public string? Info { get; set; }
     }
 
