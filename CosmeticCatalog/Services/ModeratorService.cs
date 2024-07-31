@@ -1,6 +1,7 @@
 ﻿using CosmeticCatalog.Data;
 using CosmeticCatalog.Models;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Common;
 
 namespace CosmeticCatalog.Services
 {
@@ -17,6 +18,54 @@ namespace CosmeticCatalog.Services
             _context = context;
             _logger = logger;
         }
+
+        #region [Category]
+
+        public async Task<bool> CreateCategory(Category category, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Category> GetFullCategory(int categoryId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdateCategory(Category category, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> DeleteCategory(int categoryId, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region [Component]
+
+        public async Task<bool> CreateComponent(Component component, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Component> GetFullComponent(int componentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdateComponent(Component component, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> DeleteComponent(int componentId, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
         #region [Product]
 
@@ -167,6 +216,30 @@ namespace CosmeticCatalog.Services
                 _logger.LogError(e.Message);
                 return false;
             }
+        }
+
+        #endregion
+
+        #region [Tag]
+
+        public async Task<bool> CreateTag(Tag tag, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Tag> GetFullTag(int TagId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdateTag(Tag tag, AppUser appUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> DeleteTag(int tagId, AppUser appUser)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
