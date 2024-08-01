@@ -1,12 +1,13 @@
 ﻿using CosmeticCatalog.Data;
 using CosmeticCatalog.Models;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Common;
 
 namespace CosmeticCatalog.Services
 {
     /// <summary>
-    /// Сервис для работы с каталогом
+    /// Сервис для работы модератора с каталогом
     /// </summary>
     public class ModeratorService
     {
@@ -21,24 +22,183 @@ namespace CosmeticCatalog.Services
 
         #region [Category]
 
+        /// <summary>
+        /// Сохраняет новую категорию в БД
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> CreateCategory(Category category, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (category == null || appUser == null)
+            {
+                _logger.LogError("CreateCategory() Параметр не может быть null");
+                return false;
+            }
+
+            var mod = new CategoryModification()
+            {
+                AppUser = appUser,
+                DateTime = DateTime.Now,
+                ModificationType = ModificationType.Create,
+                Info = $"Категория \"{category.Name}\" создана пользователем \"{appUser.UserName}\"",
+                Category = category
+            };
+            category.Modifications.Add(mod);
+
+            try
+            {
+                await _context.Categories.AddAsync(category);
+                var result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    _logger.LogInformation(mod.Info);
+                    return true;
+                }
+                else return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось создать новую категорию \"{category.Name}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
-        public async Task<Category> GetFullCategory(int categoryId)
+        /// <summary>
+        /// Поиск категории по id
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <returns>Возвращает категорию со всеми модификациями и вложенными категориями.
+        /// Не заполняет список продуктов.</returns>
+        public async Task<Category?> GetFullCategory(int categoryId)
         {
-            throw new NotImplementedException();
+            return await _context.Categories
+                .Include(c => c.Children)
+                .Include(c => c.Modifications)
+                .FirstOrDefaultAsync(c => c.Id == categoryId);
         }
 
+        /// <summary>
+        /// Обновляет изменения в категории. Для добавления продуктов использовать UpdateProduct(), иначе возникнут проблемы с историей модификаций.
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> UpdateCategory(Category category, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (category == null || appUser == null)
+            {
+                _logger.LogError("UpdateCategory() Параметр не может быть null");
+                return false;
+            }
+
+            // Проверки на правильность вложений категорий
+            if (category.Parent?.Id == category.Id || category.Children.Contains(category))
+            {
+                _logger.LogError($"UpdateCategory() Ошибка изменения категории \"{category?.Name}\". Категория не может ссылаться на саму себя");
+                return false;
+            }
+            if (category.Parent != null && category.Children.Contains(category.Parent))
+            {
+                _logger.LogError($"UpdateCategory() Ошибка изменения категории \"{category?.Name}\". " +
+                    $"Категория не может содержать один и тот же экземпляр каталога в Parent и Children полях");
+                return false;
+            }
+
+            var mod = new CategoryModification()
+            {
+                AppUser = appUser,
+                DateTime = DateTime.Now,
+                ModificationType = ModificationType.Update,
+                Info = $"Категория \"{category.Name}\" изменена пользователем \"{appUser.UserName}\"",
+                Category = category
+            };
+            category.Modifications.Add(mod);
+
+            try
+            {
+                _context.Categories.Update(category);
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    _logger.LogInformation(mod.Info);
+                    return true;
+                }
+                else return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось обновить категорию \"{category.Name}\" Id \"{category.Id}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Удаляет категорию и все модификации. Создает стандартную модификацию с типом Delete
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> DeleteCategory(int categoryId, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (appUser == null)
+            {
+                _logger.LogError("DeleteCategory() Параметр не может быть null");
+                return false;
+            }
+
+            var category = await _context.Categories
+                .Include(c => c.Children.Take(1))
+                .Include(c => c.Products.Take(1))
+                .FirstOrDefaultAsync(p => p.Id == categoryId);
+            if (category == null)
+            {
+                _logger.LogError($"Категория с id \"{categoryId}\" не найдена");
+                return false;
+            }
+
+            // Проверка на наличие зависимых сущностей
+            if (category.Children.Count > 0)
+            {
+                _logger.LogError($"Не удалось удалить категорию \"{category.Name}\" id \"{categoryId}\"." +
+                    $" Невозможно удалить категорию если она содержит подкатегории");
+                return false;
+            }
+            if (category.Products.Count > 0)
+            {
+                _logger.LogError($"Не удалось удалить категорию \"{category.Name}\" id \"{categoryId}\"." +
+                    $" Невозможно удалить категорию если она содержит продукты");
+                return false;
+            }
+
+            try
+            {
+                var mod = new Modification()
+                {
+                    AppUser = appUser,
+                    DateTime = DateTime.Now,
+                    ModificationType = ModificationType.Delete,
+                    Info = $"Категория \"{category.Name}\" Id \"{category.Id}\" удален пользователем \"{appUser.UserName}\""
+                };
+
+                _context.Remove(category);
+                await _context.SaveChangesAsync();
+
+                await _context.Modifications.AddAsync(mod);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(mod.Info);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось удалить категорию \"{category.Name}\" id \"{categoryId}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
         #endregion
@@ -79,7 +239,7 @@ namespace CosmeticCatalog.Services
         {
             if (product == null || appUser == null)
             {
-                _logger.LogError("Параметр не может быть null");
+                _logger.LogError("CreateProduct() Параметр не может быть null");
                 return false;
             }
 
@@ -120,6 +280,7 @@ namespace CosmeticCatalog.Services
         public async Task<Product?> GetFullProduct(int productId)
         {
             var result = await _context.Products
+                .Include(p => p.Components)
                 .Include(p => p.Tags)
                 .Include(p => p.Modifications)
                 .FirstOrDefaultAsync(p => p.Id == productId);
@@ -136,7 +297,7 @@ namespace CosmeticCatalog.Services
         {
             if (product == null || appUser == null)
             {
-                _logger.LogError("Параметр не может быть null");
+                _logger.LogError("UpdateProduct() Параметр не может быть null");
                 return false;
             }
 
@@ -180,7 +341,7 @@ namespace CosmeticCatalog.Services
         {
             if (appUser == null)
             {
-                _logger.LogError("Параметр не может быть null");
+                _logger.LogError("DeleteProduct() Параметр не может быть null");
                 return false;
             }
 
