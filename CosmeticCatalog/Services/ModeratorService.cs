@@ -204,24 +204,161 @@ namespace CosmeticCatalog.Services
 
         #region [Component]
 
+        /// <summary>
+        /// Сохраняет новый компноент в БД
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> CreateComponent(Component component, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (component == null || appUser == null)
+            {
+                _logger.LogError("CreateComponent() Параметр не может быть null");
+                return false;
+            }
+
+            var mod = new ComponentModification()
+            {
+                AppUser = appUser,
+                DateTime = DateTime.Now,
+                ModificationType = ModificationType.Create,
+                Info = $"Компонент \"{component.Name}\" создан пользователем \"{appUser.UserName}\"",
+                Component = component
+            };
+            component.Modifications.Add(mod);
+
+            try
+            {
+                await _context.Components.AddAsync(component);
+                var result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    _logger.LogInformation(mod.Info);
+                    return true;
+                }
+                else return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось создать новый компонент \"{component.Name}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
-        public async Task<Component> GetFullComponent(int componentId)
+        /// <summary>
+        /// Возвращает компонент со всеми модификациями. Не заполняет список продуктов и тегов.
+        /// </summary>
+        /// <param name="componentId"></param>
+        /// <returns>Комнонент или null</returns>
+        public async Task<Component?> GetFullComponent(int componentId)
         {
-            throw new NotImplementedException();
+            return await _context.Components
+                .Include(c => c.Modifications)
+                .FirstOrDefaultAsync(c => c.Id == componentId);
         }
 
+        /// <summary>
+        /// Обновляет изменения в компонент. Для добавления продуктов использовать UpdateProduct().
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> UpdateComponent(Component component, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (component == null || appUser == null)
+            {
+                _logger.LogError("UpdateComponent() Параметр не может быть null");
+                return false;
+            }
+
+            var mod = new ComponentModification()
+            {
+                AppUser = appUser,
+                DateTime = DateTime.Now,
+                ModificationType = ModificationType.Update,
+                Info = $"Компонент \"{component.Name}\" изменен пользователем \"{appUser.UserName}\"",
+                Component = component
+            };
+            component.Modifications.Add(mod);
+
+            try
+            {
+                _context.Components.Update(component);
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    _logger.LogInformation(mod.Info);
+                    return true;
+                }
+                else return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось обновить компонент \"{component.Name}\" Id \"{component.Id}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Удаляет компонент, если нет зависимых продуктов.
+        /// </summary>
+        /// <param name="componentId"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> DeleteComponent(int componentId, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (appUser == null)
+            {
+                _logger.LogError("DeleteComponent() Параметр не может быть null");
+                return false;
+            }
+
+            var component = await _context.Components
+                .Include(c => c.Products.Take(1))
+                .FirstOrDefaultAsync(p => p.Id == componentId);
+            if (component == null)
+            {
+                _logger.LogError($"Компонент с id \"{componentId}\" не найден");
+                return false;
+            }
+
+            // Проверка на наличие зависимых сущностей
+            if (component.Products.Count > 0)
+            {
+                _logger.LogError($"Не удалось удалить компонент \"{component.Name}\" id \"{componentId}\"." +
+                    $" Невозможно удалить компонент если он используется в  продуктах");
+                return false;
+            }
+
+            try
+            {
+                var mod = new Modification()
+                {
+                    AppUser = appUser,
+                    DateTime = DateTime.Now,
+                    ModificationType = ModificationType.Delete,
+                    Info = $"Компонент \"{component.Name}\" Id \"{component.Id}\" удален пользователем \"{appUser.UserName}\""
+                };
+
+                _context.Remove(component);
+                await _context.SaveChangesAsync();
+
+                await _context.Modifications.AddAsync(mod);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(mod.Info);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось удалить компонент \"{component.Name}\" id \"{componentId}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
         #endregion
