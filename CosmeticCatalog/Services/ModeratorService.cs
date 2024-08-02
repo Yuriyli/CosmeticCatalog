@@ -69,12 +69,11 @@ namespace CosmeticCatalog.Services
         /// Поиск категории по id
         /// </summary>
         /// <param name="categoryId"></param>
-        /// <returns>Возвращает категорию со всеми модификациями и вложенными категориями.
-        /// Не заполняет список продуктов.</returns>
+        /// <returns>Возвращает категорию со всеми модификациями.
+        /// Не заполняет список продуктов и вложенных категорий.</returns>
         public async Task<Category?> GetFullCategory(int categoryId)
         {
             return await _context.Categories
-                .Include(c => c.Children)
                 .Include(c => c.Modifications)
                 .FirstOrDefaultAsync(c => c.Id == categoryId);
         }
@@ -383,24 +382,176 @@ namespace CosmeticCatalog.Services
 
         #region [Tag]
 
+        /// <summary>
+        /// Схраняет новый тег в БД
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> CreateTag(Tag tag, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (tag == null || appUser == null)
+            {
+                _logger.LogError("CreateTag() Параметр не может быть null");
+                return false;
+            }
+
+            var mod = new TagModification()
+            {
+                AppUser = appUser,
+                DateTime = DateTime.Now,
+                ModificationType = ModificationType.Create,
+                Info = $"Тег \"{tag.Name}\" создан пользователем \"{appUser.UserName}\"",
+                Tag = tag
+            };
+            tag.Modifications.Add(mod);
+
+            try
+            {
+                await _context.Tags.AddAsync(tag);
+                var result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    _logger.LogInformation(mod.Info);
+                    return true;
+                }
+                else return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось создать новый тег \"{tag.Name}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
-        public async Task<Tag> GetFullTag(int TagId)
+        /// <summary>
+        /// Поиск тега по Id
+        /// </summary>
+        /// <param name="TagId"></param>
+        /// <returns>Возвращает тег со всеми модификациями. Не заполняет список продуктов и компонентов</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Tag?> GetFullTag(int tagId)
         {
-            throw new NotImplementedException();
+            return await _context.Tags
+                .Include(t => t.Modifications)
+                .FirstOrDefaultAsync(t => t.Id == tagId);
         }
 
+        /// <summary>
+        /// Обновляет изменения в теге. Для добавления тегов в продукты и компоненты - использовать соответсующие методы их обновления.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> UpdateTag(Tag tag, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (tag == null || appUser == null)
+            {
+                _logger.LogError("UpdateTag() Параметр не может быть null");
+                return false;
+            }
+
+            if (tag.Components.Count > 0 || tag.Products.Count > 0)
+            {
+                _logger.LogError($"UpdateTag() Ошибка изменения тега \"{tag?.Name}\". " +
+                    $"К тегу невозможно добавить компонент или продукт. Доступны только обратные операции при обновлении компонента или продукта");
+                return false;
+            }
+
+            var mod = new TagModification()
+            {
+                AppUser = appUser,
+                DateTime = DateTime.Now,
+                ModificationType = ModificationType.Update,
+                Info = $"Тег \"{tag.Name}\" изменен пользователем \"{appUser.UserName}\"",
+                Tag = tag
+            };
+            tag.Modifications.Add(mod);
+
+            try
+            {
+                _context.Tags.Update(tag);
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    _logger.LogInformation(mod.Info);
+                    return true;
+                }
+                else return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось обновить тег \"{tag.Name}\" Id \"{tag.Id}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Удаляет тег, если нет зависимых продуктов или компонентов
+        /// </summary>
+        /// <param name="tagId"></param>
+        /// <param name="appUser"></param>
+        /// <returns>bool успех/неуспех</returns>
         public async Task<bool> DeleteTag(int tagId, AppUser appUser)
         {
-            throw new NotImplementedException();
+            if (appUser == null)
+            {
+                _logger.LogError("DeleteTag() Параметр не может быть null");
+                return false;
+            }
+
+            var tag = await _context.Tags
+                .Include(c => c.Components.Take(1))
+                .Include(c => c.Products.Take(1))
+                .FirstOrDefaultAsync(p => p.Id == tagId);
+            if (tag == null)
+            {
+                _logger.LogError($"Тег с id \"{tagId}\" не найден");
+                return false;
+            }
+
+            // Проверка на наличие зависимых сущностей
+            if (tag.Components.Count > 0)
+            {
+                _logger.LogError($"Не удалось удалить тег \"{tag.Name}\" id \"{tagId}\"." +
+                    $" Невозможно удалить тег если он используется в компонентах");
+                return false;
+            }
+            if (tag.Products.Count > 0)
+            {
+                _logger.LogError($"Не удалось удалить тег \"{tag.Name}\" id \"{tagId}\"." +
+                    $" Невозможно удалить тег если он используется в  продуктах");
+                return false;
+            }
+
+            try
+            {
+                var mod = new Modification()
+                {
+                    AppUser = appUser,
+                    DateTime = DateTime.Now,
+                    ModificationType = ModificationType.Delete,
+                    Info = $"Тег \"{tag.Name}\" Id \"{tag.Id}\" удален пользователем \"{appUser.UserName}\""
+                };
+
+                _context.Remove(tag);
+                await _context.SaveChangesAsync();
+
+                await _context.Modifications.AddAsync(mod);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(mod.Info);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Не удалось удалить тег \"{tag.Name}\" id \"{tagId}\"");
+                _logger.LogError(e.Message);
+                return false;
+            }
         }
 
         #endregion
