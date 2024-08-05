@@ -1,4 +1,9 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿function changeChevrone(id) {
+    const element = document.getElementById(id);
+    if (element.style.transform == "rotate(-90deg)") {
+        element.style.transform = null;
+    }
+    else {
+        element.style.transform = "rotate(-90deg)";
+    }
+}

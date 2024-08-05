@@ -1,0 +1,15 @@
+﻿@* CatalogMenu *@
+
+@model List<Category>
+@{
+    var firstLayer = Model.Where(c => c.Parent == null);
+}
+<nav class="colapse" id="nav-menu" aria-label="Навигация по каталогу" aria-expanded="false">
+    <ul class="menu-list">        
+        @foreach (var c in firstLayer)
+        {
+            <vc:catalog-menu-layer base-category="@c" all-categories="@Model"></vc:catalog-menu-layer>
+        }        
+    </ul>
+
+</nav>

@@ -1,0 +1,31 @@
+﻿@* CatalogMenuLayer *@
+
+<li>
+    <div class="menu-element">
+        @if (ViewBag.HasChildren)
+        {
+            <div class="menu-logo-container">
+                <button id="btnChevron-@ViewBag.BaseCategory.Id" class="menu-btn" type="button"
+                        onclick="changeChevrone('btnChevron-@ViewBag.BaseCategory.Id')" data-bs-toggle="collapse"
+                        data-bs-target="#collapse-@ViewBag.BaseCategory.Id" aria-expanded="false" aria-controls="collapse-@ViewBag.BaseCategory.Id">
+                    <img class="menu-img" src="~/svg/chevron-down.svg" />
+                </button>
+            </div>
+            <button class="menu-btn">@ViewBag.BaseCategory.Name</button>
+            <ul class="menu-list collapse" id="collapse-@ViewBag.BaseCategory.Id">
+                @foreach (var c in ViewBag.Children)
+                {
+                    <vc:catalog-menu-layer base-category="@c" all-categories="@ViewBag.AllCategories"></vc:catalog-menu-layer>
+                }
+            </ul>
+
+        }
+        else
+        {
+            <div class="menu-logo-container"></div>
+            <button class="menu-btn">@ViewBag.BaseCategory.Name</button>
+        }
+
+
+    </div>
+</li>
