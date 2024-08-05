@@ -32,7 +32,7 @@ namespace CosmeticCatalog.Areas.Account.Controllers
         [Route("{area}/Login")]
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> Index(LoginVM loginVM)
+        public async Task<IActionResult> IndexAsync(LoginVM loginVM)
         {
             if (ModelState.IsValid)
             {
@@ -55,7 +55,7 @@ namespace CosmeticCatalog.Areas.Account.Controllers
         }
 
         [Route("{area}/Logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> LogoutAsync()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index","Home", new { area = ""});

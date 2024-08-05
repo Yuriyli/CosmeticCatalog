@@ -24,7 +24,7 @@ namespace CosmeticCatalog.Areas.Account.Controllers
 
         [Authorize]
         [Route("{area}")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> IndexAsync()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user != null)
@@ -56,7 +56,7 @@ namespace CosmeticCatalog.Areas.Account.Controllers
 
         [Route("{area}/Register")]
         [HttpPost]
-        public async Task<IActionResult> Register(UserCreateVM userModel)
+        public async Task<IActionResult> RegisterAsync(UserCreateVM userModel)
         {
             if (ModelState.IsValid)
             {

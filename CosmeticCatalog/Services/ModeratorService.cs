@@ -28,11 +28,11 @@ namespace CosmeticCatalog.Services
         /// <param name="category"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> CreateCategory(Category category, AppUser appUser)
+        public async Task<bool> CreateCategoryAsync(Category category, AppUser appUser)
         {
             if (category == null || appUser == null)
             {
-                _logger.LogError("CreateCategory() Параметр не может быть null");
+                _logger.LogError("CreateCategoryAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -71,7 +71,7 @@ namespace CosmeticCatalog.Services
         /// <param name="categoryId"></param>
         /// <returns>Возвращает категорию со всеми модификациями.
         /// Не заполняет список продуктов и вложенных категорий.</returns>
-        public async Task<Category?> GetFullCategory(int categoryId)
+        public async Task<Category?> GetFullCategoryAsync(int categoryId)
         {
             return await _context.Categories
                 .Include(c => c.Modifications)
@@ -84,11 +84,11 @@ namespace CosmeticCatalog.Services
         /// <param name="category"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> UpdateCategory(Category category, AppUser appUser)
+        public async Task<bool> UpdateCategoryAsync(Category category, AppUser appUser)
         {
             if (category == null || appUser == null)
             {
-                _logger.LogError("UpdateCategory() Параметр не может быть null");
+                _logger.LogError("UpdateCategoryAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -141,11 +141,11 @@ namespace CosmeticCatalog.Services
         /// <param name="categoryId"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> DeleteCategory(int categoryId, AppUser appUser)
+        public async Task<bool> DeleteCategoryAsync(int categoryId, AppUser appUser)
         {
             if (appUser == null)
             {
-                _logger.LogError("DeleteCategory() Параметр не может быть null");
+                _logger.LogError("DeleteCategoryAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -210,11 +210,11 @@ namespace CosmeticCatalog.Services
         /// <param name="component"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> CreateComponent(Component component, AppUser appUser)
+        public async Task<bool> CreateComponentAsync(Component component, AppUser appUser)
         {
             if (component == null || appUser == null)
             {
-                _logger.LogError("CreateComponent() Параметр не может быть null");
+                _logger.LogError("CreateComponentAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -252,7 +252,7 @@ namespace CosmeticCatalog.Services
         /// </summary>
         /// <param name="componentId"></param>
         /// <returns>Комнонент или null</returns>
-        public async Task<Component?> GetFullComponent(int componentId)
+        public async Task<Component?> GetFullComponentAsync(int componentId)
         {
             return await _context.Components
                 .Include(c => c.Modifications)
@@ -265,11 +265,11 @@ namespace CosmeticCatalog.Services
         /// <param name="component"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> UpdateComponent(Component component, AppUser appUser)
+        public async Task<bool> UpdateComponentAsync(Component component, AppUser appUser)
         {
             if (component == null || appUser == null)
             {
-                _logger.LogError("UpdateComponent() Параметр не может быть null");
+                _logger.LogError("UpdateComponentAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -309,11 +309,11 @@ namespace CosmeticCatalog.Services
         /// <param name="componentId"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> DeleteComponent(int componentId, AppUser appUser)
+        public async Task<bool> DeleteComponentAsync(int componentId, AppUser appUser)
         {
             if (appUser == null)
             {
-                _logger.LogError("DeleteComponent() Параметр не может быть null");
+                _logger.LogError("DeleteComponentAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -371,11 +371,11 @@ namespace CosmeticCatalog.Services
         /// <param name="product">Новая сущность продукта</param>
         /// <param name="appUser">AppUser для сохранения историй модификации</param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> CreateProduct(Product product, AppUser appUser)
+        public async Task<bool> CreateProductAsync(Product product, AppUser appUser)
         {
             if (product == null || appUser == null)
             {
-                _logger.LogError("CreateProduct() Параметр не может быть null");
+                _logger.LogError("CreateProductAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -413,7 +413,7 @@ namespace CosmeticCatalog.Services
         /// </summary>
         /// <param name="productId"></param>
         /// <returns>Продукт или null</returns>
-        public async Task<Product?> GetFullProduct(int productId)
+        public async Task<Product?> GetFullProductAsync(int productId)
         {
             var result = await _context.Products
                 .Include(p => p.Components)
@@ -429,11 +429,11 @@ namespace CosmeticCatalog.Services
         /// <param name="product">Продукт, который нужно изменить</param>
         /// <param name="appUser">AppUser для сохранения историй модификации</param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> UpdateProduct(Product product, AppUser appUser)
+        public async Task<bool> UpdateProductAsync(Product product, AppUser appUser)
         {
             if (product == null || appUser == null)
             {
-                _logger.LogError("UpdateProduct() Параметр не может быть null");
+                _logger.LogError("UpdateProductAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -473,11 +473,11 @@ namespace CosmeticCatalog.Services
         /// <param name="productId"></param>
         /// <param name="appUser"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteProduct(int productId, AppUser appUser)
+        public async Task<bool> DeleteProductAsync(int productId, AppUser appUser)
         {
             if (appUser == null)
             {
-                _logger.LogError("DeleteProduct() Параметр не может быть null");
+                _logger.LogError("DeleteProductAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -525,11 +525,11 @@ namespace CosmeticCatalog.Services
         /// <param name="tag"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> CreateTag(Tag tag, AppUser appUser)
+        public async Task<bool> CreateTagAsync(Tag tag, AppUser appUser)
         {
             if (tag == null || appUser == null)
             {
-                _logger.LogError("CreateTag() Параметр не может быть null");
+                _logger.LogError("CreateTagAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -568,7 +568,7 @@ namespace CosmeticCatalog.Services
         /// <param name="TagId"></param>
         /// <returns>Возвращает тег со всеми модификациями. Не заполняет список продуктов и компонентов</returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Tag?> GetFullTag(int tagId)
+        public async Task<Tag?> GetFullTagAsync(int tagId)
         {
             return await _context.Tags
                 .Include(t => t.Modifications)
@@ -581,11 +581,11 @@ namespace CosmeticCatalog.Services
         /// <param name="tag"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> UpdateTag(Tag tag, AppUser appUser)
+        public async Task<bool> UpdateTagAsync(Tag tag, AppUser appUser)
         {
             if (tag == null || appUser == null)
             {
-                _logger.LogError("UpdateTag() Параметр не может быть null");
+                _logger.LogError("UpdateTagAsync() Параметр не может быть null");
                 return false;
             }
 
@@ -632,11 +632,11 @@ namespace CosmeticCatalog.Services
         /// <param name="tagId"></param>
         /// <param name="appUser"></param>
         /// <returns>bool успех/неуспех</returns>
-        public async Task<bool> DeleteTag(int tagId, AppUser appUser)
+        public async Task<bool> DeleteTagAsync(int tagId, AppUser appUser)
         {
             if (appUser == null)
             {
-                _logger.LogError("DeleteTag() Параметр не может быть null");
+                _logger.LogError("DeleteTagAsync() Параметр не может быть null");
                 return false;
             }
 

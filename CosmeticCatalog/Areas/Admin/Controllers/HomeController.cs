@@ -37,7 +37,7 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}")]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> IndexAsync()
         {
             // Если в проекте станет много пользователей(маловероятно), сделать пагинацию и поиск
             var appUsers = _userManager.Users;
@@ -71,7 +71,7 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}/Getadminrole")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAdminRole()
+        public async Task<IActionResult> GetAdminRoleAsync()
         {
             // Проверки наличия ролей в бд, если нет создает их, если не удалось создать возвращает 404
             if (!(await _roleManager.RoleExistsAsync("Admin")))
@@ -109,7 +109,7 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}/Getadminrole")]
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> GetAdminRole(string userId)
+        public async Task<IActionResult> GetAdminRoleAsync(string userId)
         {
             // проверки на наличие ролей в бд
             if (!(await _roleManager.RoleExistsAsync("Admin"))) return new NotFoundResult();
@@ -154,7 +154,7 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}/EditUser")]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditUser(string userId)
+        public async Task<IActionResult> EditUserAsync(string userId)
         {
             var result = new UserVM();
             var appUser = await _userManager.FindByIdAsync(userId);
@@ -182,7 +182,7 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}/GiveModeratorRole")]
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GiveModeratorRole(string userId)
+        public async Task<IActionResult> GiveModeratorRoleAsync(string userId)
         {
             var appUser = await _userManager.FindByIdAsync(userId);
             if (appUser == null) return new NotFoundResult();
@@ -213,7 +213,7 @@ namespace CosmeticCatalog.Areas.Admin.Controllers
         [Route("{area}/RemoveModeratorRole")]
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveModeratorRole(string userId)
+        public async Task<IActionResult> RemoveModeratorRoleAsync(string userId)
         {
             var appUser = await _userManager.FindByIdAsync(userId);
             if (appUser == null) return new NotFoundResult();
