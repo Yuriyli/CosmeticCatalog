@@ -20,6 +20,7 @@ builder.Services.Configure<IdentityOptions>(opts =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ModeratorService>();
+builder.Services.AddScoped<CatalogService>();
 
 var app = builder.Build();
 
