@@ -1,7 +1,7 @@
 ﻿@* CatalogMenuLayer *@
 
-<li>
-    <div class="menu-element">
+<li class="nav-item">
+    <div class="menu-element nav-item">
         @if (ViewBag.HasChildren)
         {
             <div class="menu-logo-container">
@@ -11,21 +11,19 @@
                     <img class="menu-img" src="~/svg/chevron-down.svg" />
                 </button>
             </div>
-            <button class="menu-btn">@ViewBag.BaseCategory.Name</button>
+            <a class="menu-navlink" asp-action="Index" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
             <ul class="menu-list collapse" id="collapse-@ViewBag.BaseCategory.Id">
                 @foreach (var c in ViewBag.Children)
                 {
                     <vc:catalog-menu-layer base-category="@c" all-categories="@ViewBag.AllCategories"></vc:catalog-menu-layer>
                 }
             </ul>
-
         }
         else
         {
-            <div class="menu-logo-container"></div>
-            <button class="menu-btn">@ViewBag.BaseCategory.Name</button>
+            <div class="menu-logo-container">
+            </div>
+            <a class="menu-navlink" asp-action="Index" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
         }
-
-
     </div>
 </li>

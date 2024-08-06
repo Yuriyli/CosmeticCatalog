@@ -1,7 +1,23 @@
 ﻿@{
-    ViewData["Title"] = "Новое";
+    ViewData["Title"] = "Список продуктов";
 }
 
-<div class="text-center">
-    <p>Здесь будет список последних изменений.</p>
+@model int?
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-auto align-self-start">
+            <vc:catalog-menu></vc:catalog-menu>
+        </div>
+        <div class="col-lg">
+            @if(Model == null)
+            {
+                <p class="text-center fs-4">Выберите категорию</p>
+            }
+            else
+            {
+                <vc:list-of-products id=@(int)Model></vc:list-of-products>
+            }
+        </div>
+    </div>
 </div>

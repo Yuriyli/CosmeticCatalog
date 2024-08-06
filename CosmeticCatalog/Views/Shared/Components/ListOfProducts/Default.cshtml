@@ -1,0 +1,19 @@
+﻿@* ListOfProducts *@
+
+@model List<Product>
+<table class="table" style="width:max-content; margin:auto">
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td style="width:max-content"> <a class="table-link" href="Product?id=@p.Id">@p.Name</a></td>
+                @if (ViewBag.IsModerator)
+                {
+                    <td style="width:max-content">
+                        <a class="table-link" asp-area="Moderator" asp-action="Index" asp-route-id="@p.Id">Редактировать</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
