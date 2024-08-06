@@ -1,10 +1,10 @@
 ﻿@* CatalogMenu *@
 
-@model List<Category>
+@model List<CategoryMenuVM>
 @{
-    var firstLayer = Model.Where(c => c.Parent == null);
+    var firstLayer = Model.Where(c => c.ParentId == null);
 }
-<nav class=" colapse" id="nav-menu" aria-label="Навигация по каталогу" aria-expanded="false">
+<nav class=" colapse" id="nav-menu" aria-expanded="false">
     <ul class="menu-list">        
         @foreach (var c in firstLayer)
         {

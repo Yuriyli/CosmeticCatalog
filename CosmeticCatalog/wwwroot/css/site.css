@@ -27,7 +27,7 @@ body {
 
 .menu-logo-container {
     width: 28px;
-    height: 28px;
+    height: 26px;
     display: inline-block;
 }
 
@@ -42,11 +42,11 @@ body {
     color: black;
     text-decoration: none;
 }
-.menu-navlink :active {
+.menu-navlink-active {
     display: inline-block;
     margin: 0px;
     padding: 0;
-    color: blue;
+    color: mediumblue;
     text-decoration: none;
 }
 
@@ -55,8 +55,24 @@ body {
     border: none;
     outline: none;
     margin: 0px;
+    display: inline-block;    
+}
+.menu-chevron {
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    outline: none;
+    margin: 0px;
     display: inline-block;
     transition: 0.25s;
+}
+.menu-chevron-open {
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    outline: none;
+    margin: 0px;
+    display: inline-block;
+    transition: 0.25s;
+    transform: rotate(-90deg);
 }
 
 .menu-img {

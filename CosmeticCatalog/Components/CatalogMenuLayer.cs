@@ -1,20 +1,21 @@
 ﻿using CosmeticCatalog.Models;
+using CosmeticCatalog.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CosmeticCatalog.Components
 {
     public class CatalogMenuLayer : ViewComponent
     {
-        public IViewComponentResult Invoke(Category baseCategory, List<Category> allCategories)
+        public IViewComponentResult Invoke(CategoryMenuVM baseCategory, List<CategoryMenuVM> allCategories)
         {
             ViewBag.BaseCategory = baseCategory;
             ViewBag.AllCategories = allCategories;
-            var hasChildren = allCategories.Any(c => c.Parent?.Id == baseCategory.Id);
-            ViewBag.HasChildren = hasChildren;
-            if (hasChildren)
+
+            if (baseCategory.HasChildren)
             {
-                ViewBag.Children = allCategories.Where(c => c.Parent?.Id == baseCategory.Id);
+                ViewBag.Children = allCategories.Where(c => c.ParentId == baseCategory.Id);
             }
+
             return View();
         }
     }

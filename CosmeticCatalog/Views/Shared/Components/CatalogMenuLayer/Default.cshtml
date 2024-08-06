@@ -2,17 +2,26 @@
 
 <li class="nav-item">
     <div class="menu-element nav-item">
-        @if (ViewBag.HasChildren)
+        @if (ViewBag.BaseCategory.HasChildren)
         {
             <div class="menu-logo-container">
-                <button id="btnChevron-@ViewBag.BaseCategory.Id" class="menu-btn" type="button"
+                <button id="btnChevron-@ViewBag.BaseCategory.Id" class="@GetClassChevrone()" type="button"
                         onclick="changeChevrone('btnChevron-@ViewBag.BaseCategory.Id')" data-bs-toggle="collapse"
                         data-bs-target="#collapse-@ViewBag.BaseCategory.Id" aria-expanded="false" aria-controls="collapse-@ViewBag.BaseCategory.Id">
                     <img class="menu-img" src="~/svg/chevron-down.svg" />
                 </button>
             </div>
-            <a class="menu-navlink" asp-action="Index" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
-            <ul class="menu-list collapse" id="collapse-@ViewBag.BaseCategory.Id">
+
+            @if (ViewBag.BaseCategory.HasProducts)
+            {
+                <a class=@GetClassForLink() asp-action="Index" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
+            }
+            else
+            {
+                <p class="menu-navlink">@ViewBag.BaseCategory.Name</p>
+            }
+
+            <ul class="@GetClassCollapse()" id="collapse-@ViewBag.BaseCategory.Id">
                 @foreach (var c in ViewBag.Children)
                 {
                     <vc:catalog-menu-layer base-category="@c" all-categories="@ViewBag.AllCategories"></vc:catalog-menu-layer>
@@ -23,7 +32,33 @@
         {
             <div class="menu-logo-container">
             </div>
-            <a class="menu-navlink" asp-action="Index" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
+
+            @if (ViewBag.BaseCategory.HasProducts)
+            {
+                <a class=@GetClassForLink() asp-action="Index" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
+            }
+            else
+            {
+                <p class="menu-navlink">@ViewBag.BaseCategory.Name</p>
+            }
         }
     </div>
 </li>
+
+@functions {
+    string GetClassForLink()
+    {
+        if (ViewBag.BaseCategory.IsActive) return "menu-navlink-active";
+        else return "menu-navlink";
+    }
+    string GetClassCollapse()
+    {
+        if (ViewBag.BaseCategory.IsOpen) return "menu-list collapse show";
+        else return "menu-list collapse";
+    }
+    string GetClassChevrone()
+    {
+        if (ViewBag.BaseCategory.IsOpen) return "menu-chevron-open";
+        else return "menu-chevron";
+    }
+}

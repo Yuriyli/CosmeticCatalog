@@ -12,9 +12,10 @@ namespace CosmeticCatalog.Components
         {
             _catalogService = catalogService;
         }
-        public async Task<IViewComponentResult> InvokeAsync()
+
+        public async Task<IViewComponentResult> InvokeAsync(int? id)
         {
-            var categories = await _catalogService.GetCategoriesForMenuAsync();
+            var categories = await _catalogService.GetCategoriesMenuVMAsync(id);
             return View(categories);
         }
     }

@@ -1,9 +1,9 @@
 ﻿function changeChevrone(id) {
     const element = document.getElementById(id);
-    if (element.style.transform == "rotate(-90deg)") {
-        element.style.transform = null;
+    if (element.className == "menu-chevron") {
+        element.className = "menu-chevron-open";
     }
     else {
-        element.style.transform = "rotate(-90deg)";
+        element.className = "menu-chevron";
     }
 }
