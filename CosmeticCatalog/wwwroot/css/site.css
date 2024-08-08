@@ -42,6 +42,7 @@ body {
     color: black;
     text-decoration: none;
 }
+
 .menu-navlink-active {
     display: inline-block;
     margin: 0px;
@@ -55,8 +56,9 @@ body {
     border: none;
     outline: none;
     margin: 0px;
-    display: inline-block;    
+    display: inline-block;
 }
+
 .menu-chevron {
     background-color: rgba(255, 255, 255, 0);
     border: none;
@@ -65,6 +67,7 @@ body {
     display: inline-block;
     transition: 0.25s;
 }
+
 .menu-chevron-open {
     background-color: rgba(255, 255, 255, 0);
     border: none;
@@ -86,3 +89,10 @@ body {
     color: black;
     text-decoration: none;
 }
+
+.onhover-block {
+}
+
+    .onhover-block:hover {
+        display: block;
+    }
