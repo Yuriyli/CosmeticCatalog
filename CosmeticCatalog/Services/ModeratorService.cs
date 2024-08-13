@@ -1,5 +1,6 @@
 ﻿using CosmeticCatalog.Data;
 using CosmeticCatalog.Models;
+using CosmeticCatalog.ViewModels;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Common;
@@ -563,15 +564,21 @@ namespace CosmeticCatalog.Services
         }
 
         /// <summary>
-        /// Поиск тега по Id
+        /// Поиск тега по Id для Moderator/Edit/Tag
         /// </summary>
         /// <param name="TagId"></param>
-        /// <returns>Возвращает тег со всеми модификациями. Не заполняет список продуктов и компонентов</returns>
+        /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Tag?> GetFullTagAsync(int tagId)
+        public async Task<TagEditVM?> GetTagEditVMAsync(int tagId)
         {
             return await _context.Tags
-                .Include(t => t.Modifications)
+                .Select(t => new TagEditVM
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    OriginalName = t.Name,
+                    IsDeletable = t.Products.Count == 0 & t.Components.Count() == 0
+                })
                 .FirstOrDefaultAsync(t => t.Id == tagId);
         }
 
@@ -689,6 +696,17 @@ namespace CosmeticCatalog.Services
                 _logger.LogError(e.Message);
                 return false;
             }
+        }
+
+
+        /// <summary>
+        /// Проверяет имя тега на уникальность без учета регистра
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<bool> IsUniqueTagNameAsync(string name)
+        {
+            return !(await _context.Tags.AnyAsync(t => t.Name.ToLower() == name.ToLower()));
         }
 
         #endregion

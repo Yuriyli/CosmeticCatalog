@@ -1,4 +1,10 @@
-﻿@{
+﻿@model List<Tag>
+
+@{
     ViewData["Title"] = "Список тегов";
 }
-Moderator/List/Tag
+
+@foreach (var t in Model)
+{
+    <tag tag-model=@t href="@Url.Action("Tag","Edit",new {Id = t.Id})" />
+}

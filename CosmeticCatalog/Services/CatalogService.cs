@@ -73,5 +73,10 @@ namespace CosmeticCatalog.Services
 
             return result;
         }
+
+        public async Task<List<Tag>> GetTagsAsync()
+        {
+            return await _context.Tags.ToListAsync();
+        }
     }
 }

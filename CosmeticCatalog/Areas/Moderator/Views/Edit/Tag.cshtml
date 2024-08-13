@@ -1,4 +1,30 @@
-﻿@{
+﻿@model TagEditVM
+@{
     ViewData["Title"] = "Редактор тегов";
 }
-Moderator/Edit/Tag
+<div style="text-align:center;">
+    <card title="Редактировать тег @("\"" + Model.Name + "\""):" max-width="500">
+        <form method="post">
+            <div class="form-group">
+                @Html.ValidationSummary()
+                <label asp-for="Name" class="form-label"></label>
+                <input class="form-control" asp-for="Name" />
+                <span asp-validation-for="Name"></span>
+            </div>
+            <br />
+            <button class="btn btn-primary mt-3">Сохранить изменения</button>
+        </form>
+        <br />
+        @if (Model.IsDeletable)
+        {
+            <form method="post" asp-action="TagDelete" asp-route-id="@Model.Id">
+                <button class="btn btn-danger">Удалить тег</button>
+            </form>
+        }
+        else
+        {
+            <button class="btn btn-danger" disabled>Удалить тег</button>
+            <p class="text-danger mt-3">Невозможно удалить тег, пока он используется в продуктах или компонентах</p>
+        }
+    </card>
+</div>

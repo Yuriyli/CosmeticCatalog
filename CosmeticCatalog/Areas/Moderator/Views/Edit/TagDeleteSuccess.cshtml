@@ -1,0 +1,12 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Тег создан";
+}
+
+<div style="text-align:center;">
+    <card title="Тег @("\"" + @Model + "\"") успешно удален">
+        <form method="get" asp-area="Moderator" asp-controller="List" asp-action="Tag">
+            <button type="submit" class="btn btn-primary m-1">Перейти к спику тегов</button>
+        </form>
+    </card>
+</div>

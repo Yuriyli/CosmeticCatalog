@@ -1,4 +1,15 @@
-﻿@{
+﻿@model TagEditVM
+@{
     ViewData["Title"] = "Создать тег";
 }
-Moderator/Create/Tag
+
+<div style="text-align:center;">
+    <card title="Создать тег:" min-width="350">
+        <form method="post" class="needs-validation" novalidate>
+            <label asp-for="Name" class="form-label"></label>
+            <input class="form-control" asp-for="Name" />
+            <span asp-validation-for="Name"></span>
+            <button class="btn btn-primary mt-3">Создать</button>
+        </form>
+    </card>
+</div>
