@@ -2,6 +2,8 @@
 using CosmeticCatalog.Models;
 using CosmeticCatalog.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace CosmeticCatalog.Services
 {
@@ -16,19 +18,8 @@ namespace CosmeticCatalog.Services
             _context = context;
         }
 
-        public async Task<List<Product>> GetSimpleProductListFromCategotyAsync(int? categoryId)
-        {
-            var result = new List<Product>();
-            result = await _context.Products
-                .Where(p => p.Category != null && p.Category.Id == categoryId)
-                .Select(p => new Product
-                {
-                    Id = p.Id,
-                    Name = p.Name
-                })
-                .ToListAsync();
-            return result;
-        }
+
+        #region Category
 
         /// <summary>
         /// Получить список категорий для построения древовидного меню каталога.
@@ -74,9 +65,75 @@ namespace CosmeticCatalog.Services
             return result;
         }
 
+        #endregion
+
+        #region Component
+
+        /// <summary>
+        /// Получить компонент включая вложенные теги
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Component?> GetComponentAsync(int id)
+        {
+            return await _context.Components
+                .Include(c => c.Tags)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        /// <summary>
+        /// Получить полный список компонентов включая вложенные теги
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Component>> GetComponentsAsync()
+        {
+            return await _context.Components
+                .Include(c => c.Tags)
+                .ToListAsync();
+        }
+
+        #endregion
+
+        #region Product
+
+        public async Task<List<Product>> GetSimpleProductListFromCategotyAsync(int? categoryId)
+        {
+            var result = new List<Product>();
+            result = await _context.Products
+                .Where(p => p.Category != null && p.Category.Id == categoryId)
+                .Select(p => new Product
+                {
+                    Id = p.Id,
+                    Name = p.Name
+                })
+                .ToListAsync();
+            return result;
+        }
+
+        #endregion
+
+        #region Tag
+
+        /// <summary>
+        /// Получить полный список тегов
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<Tag>> GetTagsAsync()
         {
-            return await _context.Tags.ToListAsync();
+            return await _context.Tags.OrderBy(t => t.Name).ToListAsync();
         }
+
+        /// <summary>
+        /// Получить список тегов c помощью списка id тегов
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<List<Tag>> GetTagsAsync(IEnumerable<int> ids)
+        {
+            return await _context.Tags.Where(t => ids.Contains(t.Id)).ToListAsync();
+        }
+
+        #endregion
     }
 }

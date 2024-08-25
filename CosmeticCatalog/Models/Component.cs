@@ -1,4 +1,6 @@
-﻿namespace CosmeticCatalog.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CosmeticCatalog.Models
 {
     /// <summary>
     /// Компонент входящий в состав продукта

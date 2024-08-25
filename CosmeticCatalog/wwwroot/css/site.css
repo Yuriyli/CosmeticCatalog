@@ -103,10 +103,52 @@ body {
     text-decoration: none;
 }
 
+.tag-s {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+.tag-s:hover {
+    color: red;
+}
+.tag-sm {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;    
+}
+
+    .tag-sm:hover {
+        color: green;
+    }
+
+.tag-sm-selected {
+    color: blue;
+}
+
+.tag-devider {
+    display:inline-block;
+    user-select: none;
+    margin: 0px;
+}
+.tag-wrapper
+{
+    white-space:nowrap;
+    display:inline-block;
+}
+.tag-list {
+    display: inline-block;
+    user-select: none;
+    font-size: 14px;
+}
+
+
 .field-validation-error {
     color: red;
     font-size: smaller;
 }
+
 .card-m-auto {
     margin: auto;
     display: inline-block;

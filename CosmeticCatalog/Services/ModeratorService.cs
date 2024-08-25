@@ -286,9 +286,35 @@ namespace CosmeticCatalog.Services
 
             try
             {
-                _context.Components.Update(component);
-                var result = await _context.SaveChangesAsync();
+                var originalComponent = await _context.Components.Include(c => c.Tags).FirstOrDefaultAsync(c => c.Id == component.Id);
+                if (originalComponent == null)
+                {
+                    _logger.LogInformation($"Не удалось обновить компонент \"{component.Name}\" Id \"{component.Id}\". Ошибка загрузки из БД");
+                    return false;
+                }
 
+                originalComponent.Name = component.Name;
+                originalComponent.Description = component.Description;
+
+                // Добавляет/удаляет теги
+                foreach (var tOrig in originalComponent.Tags.ToList())
+                {
+                    var tagCheck = component.Tags.FirstOrDefault(t => t.Id == tOrig.Id);
+                    if (tagCheck == null)
+                    {
+                        var r = originalComponent.Tags.Remove(tOrig);
+                    }
+                }
+                foreach (var tag in component.Tags)
+                {
+                    var tagCheck = originalComponent.Tags.FirstOrDefault(t => t.Id == tag.Id);
+                    if (tagCheck == null)
+                    {
+                        originalComponent.Tags.Add(tag);
+                    }
+                }
+
+                var result = await _context.SaveChangesAsync();
                 if (result > 0)
                 {
                     _logger.LogInformation(mod.Info);
@@ -300,6 +326,7 @@ namespace CosmeticCatalog.Services
             {
                 _logger.LogError($"Не удалось обновить компонент \"{component.Name}\" Id \"{component.Id}\"");
                 _logger.LogError(e.Message);
+                _logger.LogError(e.InnerException?.Message);
                 return false;
             }
         }
@@ -360,6 +387,28 @@ namespace CosmeticCatalog.Services
                 _logger.LogError(e.Message);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Проверяет возможно ли удаление компонента. Нет если он содерджится внутри продуктов.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> ComponentIsDeletableAsync(int id)
+        {
+            var result = await _context.Components.Where(c => c.Id == id).SelectMany(c => c.Products).CountAsync();
+            if (result > 0) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Проверяет имя компонента на уникальность без учета регистра
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<bool> IsUniqueComponentNameAsync(string name)
+        {
+            return !(await _context.Components.AnyAsync(t => t.Name.ToLower() == name.ToLower()));
         }
 
         #endregion

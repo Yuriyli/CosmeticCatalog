@@ -22,9 +22,10 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
         }
 
         [Route("{area}/{controller}/Component")]
-        public IActionResult Component()
+        public async Task<IActionResult> ComponentAsync()
         {
-            return View();
+            var result = await _catalog.GetComponentsAsync();
+            return View(result);
         }
 
         [Route("{area}/{controller}/Product")]

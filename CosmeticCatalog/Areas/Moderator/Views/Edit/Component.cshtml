@@ -1,4 +1,64 @@
-﻿@{
+﻿@model ComponentEditVM
+@{
     ViewData["Title"] = "Редактор компонентов";
 }
-Moderator/Edit/Component
+<div style="text-align:center;">
+    @if (Model == null)
+    {
+        <p>Компонент не найден</p>
+    }
+    else
+    {
+        <card title="Редактировать компонент:" min-width="450">
+            <form id="fMain" method="post" class="needs-validation" novalidate>
+                <label asp-for="Name" class="form-label"></label>
+                <input class="form-control" asp-for="Name" />
+                <span asp-validation-for="Name"></span>
+                <br />
+
+                <label asp-for="Description" class="form-label"></label>
+                <input class="form-control" asp-for="Description" />
+                <span asp-validation-for="Description"></span>
+                <br />
+                <vc:tag-selector tag-ids="@Model.TagIds"></vc:tag-selector>
+
+                <div class="container">
+                    <div class="row justify-content-between mb-3">
+                        <div class="col text-start"><button type="button" class="btn btn-primary shadow-none" data-bs-toggle="modal" data-bs-target="#tagSelector">Изменить теги</button></div>
+                        <div class="col text-end"><button type="submit" class="btn btn-primary">Сохранить</button></div>
+                    </div>
+
+                </div>
+            </form>
+            <div class="container">
+                <div class="row justify-content-between mb-3">
+                    <div class="col text-start"><a class="btn btn-secondary" asp-action="Component" asp-route-id="@Model.Id">Отменить</a></div>
+                </div>
+                <div class="row justify-content-between mb-3">
+                    @if (ViewBag.IsDeletable)
+                    {
+                        <form method="post" asp-action="ComponentDelete" asp-route-id="@Model.Id">
+                            <div class="col text-start"><button type="submit" class="btn btn-danger">Удалить</button></div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="col text-start">
+                            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-placement="right"
+                                  title="Невозможно удалить компонент, пока он используется в продуктах">
+                                <button type="button" class="btn btn-danger" disabled>Удалить</button>
+                            </span>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </card>
+    }
+</div>
+
+
+@* Скрипт для добавления/удаления тегов*@
+@section scripts {
+    <script type="text/javascript" src="~/js/components/tagSelector.js" defer></script>
+}

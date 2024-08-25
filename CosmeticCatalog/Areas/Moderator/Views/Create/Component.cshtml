@@ -1,4 +1,43 @@
-﻿@{
+﻿@model ComponentEditVM
+
+@{
     ViewData["Title"] = "Создать компонент";
 }
-Moderator/Create/Component
+
+<div style="text-align:center;">
+    <card title="Создать новый компонент:" min-width="450">
+        <form id="fMain" method="post" class="needs-validation" novalidate>
+            <label asp-for="Name" class="form-label"></label>
+            <input class="form-control" asp-for="Name" />
+            <span asp-validation-for="Name"></span>
+            <br />
+
+            <label asp-for="Description" class="form-label"></label>
+            <input class="form-control" asp-for="Description" />
+            <span asp-validation-for="Description"></span>
+            <br />
+
+            @if (Model == null)
+            {
+                <vc:tag-selector tag-ids="@new List<int>()"></vc:tag-selector>
+            }
+            else
+            {
+                <vc:tag-selector tag-ids="@Model.TagIds"></vc:tag-selector>
+            }
+
+            <div class="container">
+                <div class="row justify-content-between">
+                    <div class="col text-start"><button type="button" class="btn btn-secondary shadow-none" data-bs-toggle="modal" data-bs-target="#tagSelector">Добавить теги</button></div>
+                    <div class="col text-end"><button type="submit" class="btn btn-primary">Создать</button></div>
+                </div>
+            </div>
+        </form>
+    </card>
+</div>
+
+
+@* Скрипт для добавления/удаления тегов*@
+@section scripts {
+    <script type="text/javascript" src="~/js/components/tagSelector.js" defer></script>
+}

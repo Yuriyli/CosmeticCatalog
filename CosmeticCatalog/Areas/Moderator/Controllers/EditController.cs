@@ -1,9 +1,11 @@
-﻿using CosmeticCatalog.Models;
+﻿using Azure;
+using CosmeticCatalog.Models;
 using CosmeticCatalog.Services;
 using CosmeticCatalog.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CosmeticCatalog.Areas.Moderator.Controllers
 {
@@ -12,15 +14,19 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
     public class EditController : Controller
     {
         private readonly ModeratorService _moderator;
+        private readonly CatalogService _catalog;
         private readonly UserManager<AppUser> _userManager;
         private readonly ILogger<EditController> _logger;
 
-        public EditController(ModeratorService moderator, UserManager<AppUser> userManager, ILogger<EditController> logger)
+        public EditController(ModeratorService moderator, CatalogService catalog, UserManager<AppUser> userManager, ILogger<EditController> logger)
         {
             _moderator = moderator;
+            _catalog = catalog;
             _userManager = userManager;
             _logger = logger;
         }
+
+        #region Category
 
         [Route("{area}/{controller}/Category")]
         public IActionResult Category()
@@ -28,17 +34,132 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
             return View();
         }
 
+        #endregion
+
+        #region Component
+
         [Route("{area}/{controller}/Component")]
-        public IActionResult Component()
+        public async Task<IActionResult> ComponentAsync(int? id)
         {
-            return View();
+            if (id == null) return new NotFoundResult();
+            var component = await _catalog.GetComponentAsync((int)id);
+            if (component == null) return new NotFoundResult();
+            var result = new ComponentEditVM()
+            {
+                Id = component.Id,
+                Name = component.Name,
+                Description = component.Description
+            };
+            foreach (var t in component.Tags)
+            {
+                result.TagIds.Add(t.Id);
+            }
+            ViewBag.IsDeletable = await _moderator.ComponentIsDeletableAsync((int)id);
+            return View(result);
         }
+
+        [Route("{area}/{controller}/Component")]
+        [HttpPost]
+        public async Task<IActionResult> ComponentAsync(ComponentEditVM component)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.IsDeletable = await _moderator.ComponentIsDeletableAsync(component.Id);
+                return View(component);
+            }
+            var originalComponent = await _catalog.GetComponentAsync(component.Id);
+            if (originalComponent == null) return new NotFoundResult();
+
+
+
+            // Если имя не совпадает без учета регистра и уникально
+            if (!originalComponent.Name.Equals(component.Name, StringComparison.CurrentCultureIgnoreCase)
+                && !await _moderator.IsUniqueComponentNameAsync(component.Name))
+            {
+                ModelState.AddModelError("Name", "Компонент с таким названием уже существует");
+                ViewBag.IsDeletable = await _moderator.ComponentIsDeletableAsync(component.Id);
+                return View(component);
+            }
+            // Если имя свопадает проверить есть ли изменения в других полях, включая теги
+            if (originalComponent.Name == component.Name)
+            {
+                bool isChanged = false;
+                if (originalComponent.Description != component.Description) isChanged = true;
+                foreach (var t in originalComponent.Tags)
+                {
+                    var isCont = component.TagIds.Contains(t.Id);
+                    if (!isCont) isChanged = true;
+                }
+                foreach (var tId in component.TagIds)
+                {
+                    var t = originalComponent.Tags.FirstOrDefault(t => t.Id == tId);
+                    if (t == null) isChanged = true;
+                }
+                if (!isChanged) return RedirectToAction("Component", new { id = component.Id });
+            }
+            var appUser = await _userManager.GetUserAsync(User);
+            if (appUser == null)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА, пользователь не идентифицирован");
+                ViewBag.IsDeletable = await _moderator.ComponentIsDeletableAsync(component.Id);
+                return View(component);
+            }
+
+            var componentDbModel = new Component
+            {
+                Id = component.Id,
+                Name = component.Name,
+                Description = component.Description
+            };
+
+            if (component.TagIds.Count == 0)
+            {
+                componentDbModel.Tags = new List<Tag>();
+            }
+            else componentDbModel.Tags = await _catalog.GetTagsAsync(component.TagIds);
+
+            var result = await _moderator.UpdateComponentAsync(componentDbModel, appUser);
+
+            if (result)
+            {
+                return View("ComponentSuccess", componentDbModel);
+            }
+            else
+            {
+                ModelState.AddModelError("Name", "ОШИБКА БД, не удалось сохранить изменения");
+                ViewBag.IsDeletable = await _moderator.ComponentIsDeletableAsync(component.Id);
+                return View(component);
+            }
+        }
+
+        [Route("{area}/{controller}/ComponentDelete")]
+        [HttpPost]
+        public async Task<IActionResult> ComponentDeleteAsync(int id)
+        {
+            var appUser = await _userManager.GetUserAsync(User);
+            if (appUser == null) return new NotFoundResult();
+
+            var component = await _catalog.GetComponentAsync(id);
+            if (component == null) return new NotFoundResult();
+
+            var result = await _moderator.DeleteComponentAsync(id, appUser);
+            if (result) return View("ComponentDeleteSuccess", component.Name);
+            return new NotFoundResult();
+        }
+
+        #endregion
+
+        #region Product
 
         [Route("{area}/{controller}/Product")]
         public IActionResult Product()
         {
             return View();
         }
+
+        #endregion
+
+        #region Tag        
 
         [Route("{area}/{controller}/Tag")]
         public async Task<IActionResult> TagAsync(int id)
@@ -59,7 +180,7 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
 
             if (tag.OriginalName == tag.Name)
             {
-                ModelState.AddModelError("Name", "Новое название не может совпадать");
+                ModelState.AddModelError("Name", "Новое название не может со совпадать");
                 return View(tag);
             }
 
@@ -108,5 +229,7 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
             if (result) return View("TagDeleteSuccess", tag.Name);
             return new NotFoundResult();
         }
+
+        #endregion
     }
 }

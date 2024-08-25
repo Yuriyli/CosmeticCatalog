@@ -1,0 +1,90 @@
+﻿@model List<int>
+
+@* Компонент должен находится внутри формы с id="fMain
+    Кнопка для открытия списка:
+    <button type="button" class="btn btn-secondary shadow-none" data-bs-toggle="modal" data-bs-target="#tagSelector">Добавить теги</button>
+    Модель - список айди тегов уже выбранных или уже привязанных к модели формы. Не должна быть null, но может быть length == 0
+    ViewBag.Tags  список всех тегов из БД
+    Модель формы должна содержать поле List<int> пример ViewModels/ComponentEditVM.cs
+    В section scripts добавить <script type="text/javascript" src="~/js/components/tagSelector.js" defer></script>
+*@
+@{
+    List<Tag> tags = ViewBag.Tags;
+    List<Tag> tagsFromModel = new();
+    foreach (var id in Model)
+    {
+        var t = tags.FirstOrDefault(t => t.Id == id);
+        if (t == null) continue;
+        tagsFromModel.Add(t);
+    }
+    tagsFromModel = tagsFromModel.OrderBy(t => t.Name).ToList();
+}
+
+<div id="tagContainer" class="container mb-4" style="max-width: 430px;">
+    @if (tagsFromModel.Count > 0)
+    {
+        for (int i = 0; i < tagsFromModel.Count; i++)
+        {
+            var t = tagsFromModel[i];
+
+            if (i + 1 != tagsFromModel.Count)
+            {
+                <div class="tag-wrapper" data-id="@t.Id">
+                    <p class="tag-s" data-id="@t.Id">@t.Name</p>
+                    <p class="tag-devider me-1">,</p>
+                </div>
+            }
+            else
+            {
+                <div class="tag-wrapper" data-id="@t.Id">
+                    <p class="tag-s" data-id="@t.Id">@t.Name</p>
+                </div>
+            }
+        }
+    }
+</div>
+
+<div id="inputContainer" hidden>
+    @foreach (var id in Model)
+    {
+        <input name="TagIds" value="@id" />
+    }
+</div>
+<div class="modal fade" id="tagSelector" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Выберите теги</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="mBody" class="modal-body">
+                @if (tags != null)
+                {
+                    for (int i = 0; i < tags.Count; i++)
+                    {
+                        int id = tags[i].Id;
+                        string classString = String.Empty;
+                        if (Model.Contains(id))
+                            classString = "tag-sm tag-sm-selected";
+                        else
+                            classString = "tag-sm";
+
+                        if (i + 1 != ViewBag.Tags.Count)
+                        {
+                            <div class="tag-wrapper">
+                                <p class="@classString" data-id="@id">@tags[i].Name</p>
+                                <p class="tag-devider me-1">,</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="tag-wrapper">
+                                <p class="@classString" data-id="@id">@tags[i].Name</p>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
