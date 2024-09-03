@@ -22,10 +22,41 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
             _userManager = userManager;
             _catalog = catalog;
         }
+
         [Route("{area}/{controller}/Category")]
         public IActionResult Category()
         {
             return View();
+        }
+
+        [Route("{area}/{controller}/Category")]
+        [HttpPost]
+        public async Task<IActionResult> CategoryAsync(CategoryEditVM categoryVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(categoryVM);
+            }
+
+            var appUser = await _userManager.GetUserAsync(User);
+            if (appUser == null)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА. Не удалось идентифицировать пользователя");
+                return View(categoryVM);
+            }
+
+            Category categotyDbModel = new Category
+            {
+                Name = categoryVM.Name,
+                ParentId = categoryVM.ParentId
+            };
+            var result = await _moderator.CreateCategoryAsync(categotyDbModel, appUser);
+            if(!result)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА БД. Не удалось создать новую категорию");
+                return View(categoryVM);
+            }
+            return  View("CategorySuccess", categotyDbModel);
         }
 
         [Route("{area}/{controller}/Component")]

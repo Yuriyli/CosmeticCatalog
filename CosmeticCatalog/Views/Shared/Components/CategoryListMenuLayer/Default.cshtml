@@ -1,4 +1,4 @@
-﻿@* CatalogMenuLayer *@
+﻿@* CategoryListMenuLayer *@
 
 <li class="nav-item">
     <div class="menu-element nav-item">
@@ -12,19 +12,12 @@
                 </button>
             </div>
 
-            @if (ViewBag.BaseCategory.HasProducts)
-            {
-                <a class=@GetClassForLink() asp-action="@ViewBag.Action" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
-            }
-            else
-            {
-                <p class="menu-navlink">@ViewBag.BaseCategory.Name</p>
-            }
+            <a class="menu-navlink" asp-controller="Edit" asp-action="Category" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
 
             <ul class="@GetClassCollapse()" id="collapse-@ViewBag.BaseCategory.Id">
                 @foreach (var c in ViewBag.Children)
                 {
-                    <vc:catalog-menu-layer base-category="@c" all-categories="@ViewBag.AllCategories" action-string="@ViewBag.Action"></vc:catalog-menu-layer>
+                    <vc:category-list-menu-layer base-category="@c" all-categories="@Model"></vc:category-list-menu-layer>
                 }
             </ul>
         }
@@ -32,25 +25,12 @@
         {
             <div class="menu-logo-container">
             </div>
-
-            @if (ViewBag.BaseCategory.HasProducts)
-            {
-                <a class=@GetClassForLink() asp-action="@ViewBag.Action" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
-            }
-            else
-            {
-                <p class="menu-navlink">@ViewBag.BaseCategory.Name</p>
-            }
+            <a class="menu-navlink" asp-controller="Edit" asp-action="Category" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
         }
     </div>
 </li>
 
 @functions {
-    string GetClassForLink()
-    {
-        if (ViewBag.BaseCategory.IsActive) return "menu-navlink-active";
-        else return "menu-navlink";
-    }
     string GetClassCollapse()
     {
         if (ViewBag.BaseCategory.IsOpen) return "menu-list collapse show";

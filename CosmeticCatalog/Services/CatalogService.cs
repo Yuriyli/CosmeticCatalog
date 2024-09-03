@@ -21,6 +21,11 @@ namespace CosmeticCatalog.Services
 
         #region Category
 
+        public async Task<Category?> GetCategoryAsync(int id)
+        {
+            return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        }
+
         /// <summary>
         /// Получить список категорий для построения древовидного меню каталога.
         /// Также отмечает флаги для отображения выбранной категории в меню.

@@ -16,9 +16,9 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
         }
 
         [Route("{area}/{controller}/Category")]
-        public IActionResult Category()
+        public IActionResult Category(int? id)
         {
-            return View();
+            return View(id);
         }
 
         [Route("{area}/{controller}/Component")]

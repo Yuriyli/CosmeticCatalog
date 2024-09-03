@@ -106,19 +106,30 @@ namespace CosmeticCatalog.Services
                 return false;
             }
 
-            var mod = new CategoryModification()
-            {
-                AppUser = appUser,
-                DateTime = DateTime.Now,
-                ModificationType = ModificationType.Update,
-                Info = $"Категория \"{category.Name}\" изменена пользователем \"{appUser.UserName}\"",
-                Category = category
-            };
-            category.Modifications.Add(mod);
+
 
             try
             {
-                _context.Categories.Update(category);
+                var originalCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+                if (originalCategory == null)
+                {
+                    _logger.LogInformation($"Не удалось обновить категорию \"{category.Name}\" Id \"{category.Id}\". Ошибка загрузки из БД");
+                    return false;
+                }
+
+                originalCategory.Name = category.Name;
+                originalCategory.ParentId = category.ParentId;                                
+
+                var mod = new CategoryModification()
+                {
+                    AppUser = appUser,
+                    DateTime = DateTime.Now,
+                    ModificationType = ModificationType.Update,
+                    Info = $"Категория \"{category.Name}\" изменена пользователем \"{appUser.UserName}\"",
+                    Category = category
+                };
+                category.Modifications.Add(mod);
+
                 var result = await _context.SaveChangesAsync();
 
                 if (result > 0)

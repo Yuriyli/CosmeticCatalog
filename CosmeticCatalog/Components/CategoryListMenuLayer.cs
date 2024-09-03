@@ -1,16 +1,14 @@
-﻿using CosmeticCatalog.Models;
-using CosmeticCatalog.ViewModels;
+﻿using CosmeticCatalog.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CosmeticCatalog.Components
 {
-    public class CatalogMenuLayer : ViewComponent
+    public class CategoryListMenuLayer : ViewComponent
     {
-        public IViewComponentResult Invoke(CategoryMenuVM baseCategory, List<CategoryMenuVM> allCategories, string actionString)
+        public IViewComponentResult Invoke(CategoryMenuVM baseCategory, List<CategoryMenuVM> allCategories)
         {
             ViewBag.BaseCategory = baseCategory;
             ViewBag.AllCategories = allCategories;
-            ViewBag.Action = actionString;
 
             if (baseCategory.HasChildren)
             {

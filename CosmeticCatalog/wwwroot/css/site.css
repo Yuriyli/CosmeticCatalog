@@ -110,13 +110,15 @@ body {
     margin-bottom: 2px;
     font-size: 14px;
 }
-.tag-s:hover {
-    color: red;
-}
+
+    .tag-s:hover {
+        color: red;
+    }
+
 .tag-sm {
     display: inline-block;
     cursor: pointer;
-    user-select: none;    
+    user-select: none;
 }
 
     .tag-sm:hover {
@@ -128,15 +130,16 @@ body {
 }
 
 .tag-devider {
-    display:inline-block;
+    display: inline-block;
     user-select: none;
     margin: 0px;
 }
-.tag-wrapper
-{
-    white-space:nowrap;
-    display:inline-block;
+
+.tag-wrapper {
+    white-space: nowrap;
+    display: inline-block;
 }
+
 .tag-list {
     display: inline-block;
     user-select: none;
@@ -154,3 +157,42 @@ body {
     display: inline-block;
     text-align: left
 }
+
+.c-selector {
+    display: inline-block;
+    margin: 0px;
+    padding: 0;
+    color: black;
+    user-select: none;
+    cursor: pointer;
+}
+
+    .c-selector:hover {
+        color: blue;
+    }
+
+.c-selector-selected {
+    display: inline-block;
+    margin: 0px;
+    padding: 0;
+    color: mediumblue;
+    user-select: none;
+    cursor: pointer;
+}
+
+    .c-selector-selected:hover {
+        color: red;
+    }
+
+.c-in-container {
+    display: inline-block;
+    margin: 0px;
+    padding: 0;
+    color: black;
+    user-select: none;
+    cursor: pointer;
+}
+
+    .c-in-container:hover {
+        color: red;
+    }

@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var tags = $('.tag-sm').each(function () {
+    $('.tag-sm').each(function () {
         $(this).on('click', function () {
             var id = $(this).data('id');
             if ($(this).hasClass('tag-sm-selected')) {

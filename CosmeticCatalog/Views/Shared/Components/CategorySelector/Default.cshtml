@@ -1,0 +1,70 @@
+﻿@model List<CategoryMenuVM>
+
+@* Компонент должен находится внутри формы с id="fMain
+    Кнопка для открытия списка:
+    <div class="col text-start"><button type="button" class="btn btn-secondary shadow-none" data-bs-toggle="modal" data-bs-target="#categorySelector">Добавить родиетльскую категорию</button></div>
+    Модель - родительская категория
+    ViewBag.CategoriesMenu  - все категории для построения меню
+    В section scripts добавить <script type="text/javascript" src="~/js/components/categorySelector.js" defer></script>
+*@
+@{
+    int? parentId = ViewBag.ParentId;
+    var firstLayer = Model.Where(c => c.ParentId == null);
+}
+
+@if (parentId != null && Model != null)
+{
+    var parentMenuVM = Model.FirstOrDefault(c => c.Id == parentId);
+    @if (parentMenuVM != null)
+    {
+        <div id="categoryContainerParent" class="mt-3">
+            <h6>Родительская категория:</h6>
+            <div id="categoryContainer" class="container mb-4" style="max-width: 430px;">
+                <p class="c-in-container" data-id="@parentMenuVM.Id">@parentMenuVM.Name</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div id="categoryContainerParent" style="display:none" class="mt-3">
+            <h6>Родительская категория:</h6>
+            <div id="categoryContainer" class="container mb-4" style="max-width: 430px;">
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div id="categoryContainerParent" style="display:none" class="mt-3">
+        <h6>Родительская категория:</h6>
+        <div id="categoryContainer" class="container mb-4" style="max-width: 430px;">
+        </div>
+    </div>
+}
+
+
+<div id="inputContainer" hidden>
+    @if (parentId != null)
+    {
+        <input name="parentId" value="@parentId" />
+    }
+</div>
+
+<div class="modal fade" id="categorySelector" tabindex="-1" aria-labelledby="categorySelectorLable" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Выберите родительскую категорию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="mBody" class="modal-body">
+                <ul class="menu-list">
+                    @foreach (var c in firstLayer)
+                    {
+                        <vc:category-selector-layer base-category="@c" all-categories="@Model"></vc:category-selector-layer>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

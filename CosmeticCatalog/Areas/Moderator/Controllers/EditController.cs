@@ -29,9 +29,64 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
         #region Category
 
         [Route("{area}/{controller}/Category")]
-        public IActionResult Category()
+        public async Task<IActionResult> CategoryAsync(int id)
         {
-            return View();
+            var categoryDb = await _catalog.GetCategoryAsync(id);
+            if (categoryDb == null) return new NotFoundResult();
+
+            var result = new CategoryEditVM
+            {
+                Id = categoryDb.Id,
+                Name = categoryDb.Name,
+                ParentId = categoryDb.ParentId
+            };
+
+            return View(result);
+        }
+
+        [Route("{area}/{controller}/Category")]
+        [HttpPost]
+        public async Task<IActionResult> CategoryAsync(CategoryEditVM categoryVM)
+        {
+            if (!ModelState.IsValid) return View(categoryVM);
+            var categoryDb = await _catalog.GetCategoryAsync(categoryVM.Id);
+            if (categoryDb == null)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА БД. Не удалось загрузить категорию.");
+                return View(categoryVM);
+            }
+
+            if(categoryVM.Id == categoryVM.ParentId)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА. Невозможно вложить категорию в саму себя.");
+                return View(categoryVM);
+            }
+            if (categoryVM.Name == categoryDb.Name && categoryVM.ParentId == categoryDb.ParentId)
+            {
+                return View(categoryVM);
+            }
+
+            var appUser = await _userManager.GetUserAsync(User);
+            if (appUser == null)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА, пользователь не идентифицирован");
+                return View(categoryVM);
+            }
+
+            var resultCategory = new Category
+            {
+                Id = categoryVM.Id,
+                Name = categoryVM.Name,
+                ParentId = categoryVM.ParentId
+            };
+
+            var result = await _moderator.UpdateCategoryAsync(resultCategory, appUser);
+            if (!result)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА БД. Не удалось обновить категорию.");
+                return View(categoryVM);
+            }
+            return View("CategorySuccess", resultCategory);
         }
 
         #endregion

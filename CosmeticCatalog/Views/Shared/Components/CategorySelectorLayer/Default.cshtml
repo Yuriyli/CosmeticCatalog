@@ -1,4 +1,4 @@
-﻿@* CatalogMenuLayer *@
+﻿@* CategorySelectorLayer *@
 
 <li class="nav-item">
     <div class="menu-element nav-item">
@@ -14,17 +14,17 @@
 
             @if (ViewBag.BaseCategory.HasProducts)
             {
-                <a class=@GetClassForLink() asp-action="@ViewBag.Action" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
+                <p class=@GetClassForLink() data-id="@ViewBag.BaseCategory.Id">@ViewBag.BaseCategory.Name</p>
             }
             else
             {
-                <p class="menu-navlink">@ViewBag.BaseCategory.Name</p>
+                <p class="c-selector" data-id="@ViewBag.BaseCategory.Id">@ViewBag.BaseCategory.Name</p>
             }
 
             <ul class="@GetClassCollapse()" id="collapse-@ViewBag.BaseCategory.Id">
                 @foreach (var c in ViewBag.Children)
                 {
-                    <vc:catalog-menu-layer base-category="@c" all-categories="@ViewBag.AllCategories" action-string="@ViewBag.Action"></vc:catalog-menu-layer>
+                    <vc:category-selector-layer base-category="@c" all-categories="@ViewBag.AllCategories"></vc:category-selector-layer>
                 }
             </ul>
         }
@@ -35,11 +35,11 @@
 
             @if (ViewBag.BaseCategory.HasProducts)
             {
-                <a class=@GetClassForLink() asp-action="@ViewBag.Action" asp-route-id=@ViewBag.BaseCategory.Id>@ViewBag.BaseCategory.Name</a>
+                <p class=@GetClassForLink() data-id="@ViewBag.BaseCategory.Id">@ViewBag.BaseCategory.Name</p>
             }
             else
             {
-                <p class="menu-navlink">@ViewBag.BaseCategory.Name</p>
+                <p class="c-selector" data-id="@ViewBag.BaseCategory.Id">@ViewBag.BaseCategory.Name</p>
             }
         }
     </div>
@@ -48,8 +48,8 @@
 @functions {
     string GetClassForLink()
     {
-        if (ViewBag.BaseCategory.IsActive) return "menu-navlink-active";
-        else return "menu-navlink";
+        if (ViewBag.BaseCategory.IsActive) return "c-selector-selected";
+        else return "c-selector";
     }
     string GetClassCollapse()
     {

@@ -1,14 +1,14 @@
-﻿@* CatalogMenu *@
+﻿@* CategoryListMenu *@
 
 @model List<CategoryMenuVM>
 @{
     var firstLayer = Model.Where(c => c.ParentId == null);
 }
 <nav class=" colapse" id="nav-menu" aria-expanded="false">
-    <ul class="menu-list">        
+    <ul class="menu-list">
         @foreach (var c in firstLayer)
         {
-            <vc:catalog-menu-layer base-category="@c" all-categories="@Model" action-string="@ViewBag.Action"></vc:catalog-menu-layer>
-        }        
+            <vc:category-list-menu-layer base-category="@c" all-categories="@Model"></vc:category-list-menu-layer>
+        }
     </ul>
 </nav>

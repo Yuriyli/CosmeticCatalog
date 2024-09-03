@@ -1,4 +1,40 @@
-﻿@{
-    ViewData["Title"] = "Редактор картегорий";
+﻿@model CategoryEditVM
+
+@{
+    ViewData["Title"] = "Редактор категорий";
 }
-Moderator/Edit/Category
+
+<div style="text-align:center;">
+    <card title="Редактировать категорию:" min-width="450">
+        <form id="fMain" method="post" class="needs-validation" novalidate>
+            <label asp-for="Name" class="form-label"></label>
+            <input class="form-control" asp-for="Name" />
+            <span asp-validation-for="Name"></span>
+
+            @if (Model == null)
+            {
+                <vc:category-selector parent-id=@null></vc:category-selector>
+            }
+            else
+            {
+                <vc:category-selector parent-id="@Model.ParentId"></vc:category-selector>
+            }
+
+            <div class="container mt-3">
+                <div class="row justify-content-between">
+                    <div class="col text-start">
+                        <button type="button" class="btn btn-secondary shadow-none" data-bs-toggle="modal" data-bs-target="#categorySelector">
+                            <span style="font-size:14px; white-space:nowrap">Выбрать родительскую категорию</span>
+                        </button>
+                    </div>
+                    <div class="col text-end"><button type="submit" class="btn btn-primary">Сохранить</button></div>
+                </div>
+            </div>
+        </form>
+    </card>
+</div>
+
+@* Скрипт для выбора категории*@
+@section scripts {
+    <script type="text/javascript" src="~/js/components/categorySelector.js" defer></script>
+}

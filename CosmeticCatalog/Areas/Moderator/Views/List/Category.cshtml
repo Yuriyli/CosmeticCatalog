@@ -1,4 +1,10 @@
-﻿@{
+﻿@model int?
+
+@{
     ViewData["Title"] = "Список категорий";
 }
-Moderator/List/Category
+<div style="text-align:center;">
+    <card title="Выберите категорию для редактирования:">
+        <vc:category-list-menu id="@Model"></vc:category-list-menu>
+    </card>
+</div>

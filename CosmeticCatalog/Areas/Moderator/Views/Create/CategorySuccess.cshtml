@@ -1,0 +1,14 @@
+﻿@model Category
+@{
+    ViewData["Title"] = "Категория создана";
+}
+<div style="text-align:center;">
+    <card title="Категория @("\"" + @Model.Name + "\"") успешно создана">
+        <form method="get" asp-area="Moderator" asp-controller="Create" asp-action="Category">
+            <button type="submit" class="btn btn-primary m-1" data-bs-dismiss="modal">Создать еще</button>
+        </form>
+        <form method="get" asp-area="Moderator" asp-controller="List" asp-action="Category">
+            <button type="submit" class="btn btn-primary m-1">Перейти к спику категорий</button>
+        </form>
+    </card>
+</div>
