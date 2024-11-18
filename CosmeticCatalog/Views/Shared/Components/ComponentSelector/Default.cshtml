@@ -1,0 +1,104 @@
+﻿@model List<int>
+
+@* Компонент должен находится внутри формы с id="fMain
+    Кнопка для открытия списка:
+    <button type="button" class="btn btn-secondary shadow-none" data-bs-toggle="modal" data-bs-target="#componentSelector">Добавить компоненты</button>
+    Модель - список айди тегов уже выбранных или уже привязанных к модели формы. Не должна быть null, но может быть length == 0
+    ViewBag.Tags  список всех тегов из БД
+    Модель формы должна содержать поле List<int> пример ViewModels/ComponentEditVM.cs
+    В section scripts добавить <script type="text/javascript" src="~/js/components/componentSelector.js" defer></script>
+*@
+@{
+    List<Component> components = ViewBag.Components;
+    List<Component> componentsFromModel = new();
+    foreach (var id in Model)
+    {
+        var comp = components.FirstOrDefault(c => c.Id == id);
+        if (comp == null) continue;
+        componentsFromModel.Add(comp);
+    }
+    componentsFromModel = componentsFromModel.OrderBy(c => c.Name).ToList();
+}
+
+@if (componentsFromModel.Count > 0)
+{
+    <div id="componentContainerParent" class="mt-3">
+        <h6>Компоненты:</h6>
+        <div id="componentContainer" class="container">
+            @for (int i = 0; i < componentsFromModel.Count; i++)
+            {
+                var comp = componentsFromModel[i];
+
+                if (i + 1 != componentsFromModel.Count)
+                {
+                    <div class="comp-wrapper" data-id="@comp.Id">
+                        <p class="comp-in-container" data-id="@comp.Id">@comp.Name</p>
+                        <p class="comp-devider me-1">,</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="comp-wrapper" data-id="@comp.Id">
+                        <p class="comp-in-container" data-id="@comp.Id">@comp.Name</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div id="componentContainerParent" style="display:none" class="mt-3">
+        <h6>Компоненты:</h6>
+        <div id="componentContainer" class="container">
+        </div>
+    </div>
+}
+
+<div id="inputComponentContainer" hidden>
+    @foreach (var id in Model)
+    {
+        <input name="ComponentIds" value="@id" />
+    }
+</div>
+
+<div class="modal fade" id="componentSelector" tabindex="-1" aria-labelledby="componentSelectorLable" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выберите теги</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                @if (components != null)
+                {
+                    for (int i = 0; i < components.Count; i++)
+                    {
+                        int id = components[i].Id;
+                        string classString = String.Empty;
+                        if (Model.Contains(id))
+                            classString = "comp-selector-selected";
+                        else
+                            classString = "comp-selector";
+
+                        if (i + 1 != components.Count)
+                        {
+                            <div class="comp-wrapper">
+                                <p class="@classString" data-id="@id">@components[i].Name</p>
+                                <p class="comp-devider me-1">,</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="comp-wrapper">
+                                <p class="@classString" data-id="@id">@components[i].Name</p>
+                            </div>
+                        }
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

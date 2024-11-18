@@ -21,13 +21,21 @@ namespace CosmeticCatalog.TagHelpers
                 titleContent = $"<h5 class=\"card-title\">{Title}</h5><br />";
             }
 
-            if (MaxWidth > 0)
+
+            if (MinWidth > 0 && MaxWidth > 0)
             {
-                output.Attributes.Add("style", $"max-width:{MaxWidth}px");
+                output.Attributes.Add("style", $"max-width:{MaxWidth}px; min-width:{MinWidth}px;");
             }
-            if (MinWidth > 0)
+            else
             {
-                output.Attributes.Add("style", $"min-width:{MinWidth}px");
+                if (MaxWidth > 0)
+                {
+                    output.Attributes.Add("style", $"max-width:{MaxWidth}px;");
+                }
+                if (MinWidth > 0)
+                {
+                    output.Attributes.Add("style", $"min-width:{MinWidth}px;");
+                }
             }
             var content = $"<div class=\"card-body\">{titleContent}{childContent}</div>";
             output.Content.SetHtmlContent(content);

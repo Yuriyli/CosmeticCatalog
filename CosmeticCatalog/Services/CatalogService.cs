@@ -2,6 +2,7 @@
 using CosmeticCatalog.Models;
 using CosmeticCatalog.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging.Signing;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -96,6 +97,15 @@ namespace CosmeticCatalog.Services
             return await _context.Components
                 .Include(c => c.Tags)
                 .ToListAsync();
+        }
+        /// <summary>
+        /// Получить список компонентов c помощью списка id компонентов
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<List<Component>> GetComponentsAsync(IEnumerable<int> ids)
+        {
+            return await _context.Components.Where(t => ids.Contains(t.Id)).ToListAsync();
         }
 
         #endregion

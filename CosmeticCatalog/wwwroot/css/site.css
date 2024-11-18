@@ -185,6 +185,17 @@ body {
     }
 
 .c-in-container {
+    color: black;
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+    .c-in-container:hover {
+        color: red;
+    }
+
+.comp-selector {
     display: inline-block;
     margin: 0px;
     padding: 0;
@@ -193,6 +204,40 @@ body {
     cursor: pointer;
 }
 
-    .c-in-container:hover {
+    .comp-selector:hover {
+        color: blue;
+    }
+
+.comp-selector-selected {
+    display: inline-block;
+    margin: 0px;
+    padding: 0;
+    color: mediumblue;
+    user-select: none;
+    cursor: pointer;
+}
+
+    .comp-selector-selected:hover {
         color: red;
     }
+
+.comp-in-container {
+    color: black;
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+    .comp-in-container:hover {
+        color: red;
+    }
+.comp-devider {
+    display: inline-block;
+    user-select: none;
+    margin: 0px;
+}
+
+.comp-wrapper {
+    white-space: nowrap;
+    display: inline-block;
+}

@@ -10,7 +10,7 @@
                 @if (ViewBag.IsModerator)
                 {
                     <td style="width:max-content">
-                        <a class="table-link" asp-area="Moderator" asp-action="Index" asp-route-id="@p.Id">Редактировать</a>
+                        <a class="table-link" asp-area="Moderator" asp-controller="Edit" asp-action="Product" asp-route-id="@p.Id">Редактировать</a>
                     </td>
                 }
             </tr>

@@ -23,6 +23,8 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
             _catalog = catalog;
         }
 
+        #region Category
+
         [Route("{area}/{controller}/Category")]
         public IActionResult Category()
         {
@@ -51,13 +53,17 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
                 ParentId = categoryVM.ParentId
             };
             var result = await _moderator.CreateCategoryAsync(categotyDbModel, appUser);
-            if(!result)
+            if (!result)
             {
                 ModelState.AddModelError("Name", "ОШИБКА БД. Не удалось создать новую категорию");
                 return View(categoryVM);
             }
-            return  View("CategorySuccess", categotyDbModel);
+            return View("CategorySuccess", categotyDbModel);
         }
+
+        #endregion
+
+        #region Component
 
         [Route("{area}/{controller}/Component")]
         public async Task<IActionResult> ComponentAsync()
@@ -113,11 +119,63 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
             }
         }
 
+        #endregion
+
+        #region Product
+
         [Route("{area}/{controller}/Product")]
         public IActionResult Product()
         {
             return View();
         }
+
+        [Route("{area}/{controller}/Product")]
+        [HttpPost]
+        public async Task<IActionResult> ProductAsync(ProductEditVM productVM)
+        {
+            if (!ModelState.IsValid) return View(productVM);
+            if (productVM.ParentId == null)
+            {
+                ModelState.AddModelError("ParentId", "Необходимо выбрать категорию");
+                return View(productVM);
+            }
+
+            var appUser = await _userManager.GetUserAsync(User);
+            if (appUser == null)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА. Не удалось идентифицировать пользователя");
+                return View(productVM);
+            }
+
+            var productDb = new Product
+            {
+                Name = productVM.Name,
+                Description = productVM.Description,
+                CategoryId = productVM.ParentId
+            };
+            if (productVM.ComponentIds.Count > 0)
+            {
+                productDb.Components = await _catalog.GetComponentsAsync(productVM.ComponentIds);
+            }
+            if (productVM.TagIds.Count > 0)
+            {
+                productDb.Tags = await _catalog.GetTagsAsync(productVM.TagIds);
+            }
+
+            var result = await _moderator.CreateProductAsync(productDb, appUser);
+            if (!result)
+            {
+                ModelState.AddModelError("Name", "ОШИБКА. Не удалось создать новый тег.");
+                return View(productVM);
+            }
+            else
+            {
+                return View("ProductSuccess", productDb);
+            }
+        }
+        #endregion
+
+        #region Tag
 
         [Route("{area}/{controller}/Tag")]
         public IActionResult Tag()
@@ -163,5 +221,7 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
                 return View("TagSuccess", tag);
             }
         }
+
+        #endregion
     }
 }

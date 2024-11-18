@@ -1,10 +1,12 @@
-﻿$(function () {
+﻿//TODO: Переписать, закомментить
+
+$(function () {
     $('.tag-sm').each(function () {
         $(this).on('click', function () {
             var id = $(this).data('id');
             if ($(this).hasClass('tag-sm-selected')) {
                 removeFromTagContainer($('#tagContainer > [data-id="' + id + '"]'));
-                $('#inputContainer > [value="' + id + '"]').remove();
+                $('#inputTagContainer > [value="' + id + '"]').remove();
             }
             else {
                 if ($('#tagContainer > .tag-wrapper').length == 0) {
@@ -16,7 +18,7 @@
                         + $(this).text() + '</p></div>');
                     $('#tagContainer > [data-id="' + id + '"]').prev().append('<p class="tag-devider me-1">,</p>');
                 }
-                $('#inputContainer').append('<input name="TagIds" value="' + id + '"/>')
+                $('#inputTagContainer').append('<input name="TagIds" value="' + id + '"/>')
             }
             $(this).toggleClass('tag-sm-selected');
         });
@@ -28,7 +30,7 @@
         var elemModal = $('#mBody>.tag-wrapper>[data-id="' + id + '"]');
         elemModal.toggleClass('tag-sm-selected');
         removeFromTagContainer($('#tagContainer > [data-id="' + id + '"]'));
-        $('#inputContainer > [value="' + id + '"]').remove();
+        $('#inputTagContainer > [value="' + id + '"]').remove();
     });
 
 });

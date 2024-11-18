@@ -1,4 +1,70 @@
-﻿@{
+﻿@model ProductEditVM
+
+@{
     ViewData["Title"] = "Создать продукт";
 }
-Moderator/Create/Product
+
+<div style="text-align:center;">
+    <card title="Создать новую категорию:" min-width="800" max-width="800">
+        <form id="fMain" method="post" class="needs-validation" novalidate>
+            <label asp-for="Name" class="form-label"></label>
+            <input class="form-control" style="max-width:400px;" asp-for="Name" />
+            <span asp-validation-for="Name" style="display:block" class="mb-3"></span>
+
+            <label asp-for="Description" class="form-label"></label>
+            <textarea class="form-control mb-4" asp-for="Description" rows="6"></textarea>
+
+            @if (Model == null)
+            {
+                <vc:category-selector parent-id=@null></vc:category-selector>
+            }
+            else
+            {
+                <vc:category-selector parent-id="@Model.ParentId"></vc:category-selector>
+            }
+            <div class="text-start">
+                <span class="mb-2" asp-validation-for="ParentId" style="display:block"></span>
+                <button type="button" class="btn btn-secondary shadow-none mb-3" data-bs-toggle="modal" data-bs-target="#categorySelector">
+                    <span style="font-size:14px; white-space:nowrap">Выбрать родительскую категорию</span>
+                </button>
+            </div>
+
+            @if (Model == null)
+            {
+                <vc:component-selector component-ids="@new List<int>()"></vc:component-selector>
+            }
+            else
+            {
+                <vc:component-selector component-ids="@Model.ComponentIds"></vc:component-selector>
+            }
+            <div class="text-start">
+                <button type="button" class="btn btn-secondary shadow-none mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#componentSelector">Добавить компоненты</button>
+            </div>
+
+            @if (Model == null)
+            {
+                <vc:tag-selector tag-ids="@new List<int>()"></vc:tag-selector>
+            }
+            else
+            {
+                <vc:tag-selector tag-ids="@Model.TagIds"></vc:tag-selector>
+            }
+            <div class="text-start">
+                <button type="button" class="btn btn-secondary shadow-none mt-3" data-bs-toggle="modal" data-bs-target="#tagSelector">Добавить теги</button>
+            </div>
+
+            <div class="container mt-3">
+                <div class="row justify-content-between">
+                    <div class="col text-end"><button type="submit" class="btn btn-primary">Создать</button></div>
+                </div>
+            </div>
+        </form>
+    </card>
+</div>
+
+@* Скрипты для селекторов*@
+@section scripts {
+    <script type="text/javascript" src="~/js/components/categorySelector.js" defer></script>
+    <script type="text/javascript" src="~/js/components/tagSelector.js" defer></script>
+        <script type="text/javascript" src="~/js/components/componentSelector.js" defer></script>
+}

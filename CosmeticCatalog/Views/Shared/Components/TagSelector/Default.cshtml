@@ -20,7 +20,7 @@
     tagsFromModel = tagsFromModel.OrderBy(t => t.Name).ToList();
 }
 
-<div id="tagContainer" class="container mb-4" style="max-width: 430px;">
+<div id="tagContainer" class="container">
     @if (tagsFromModel.Count > 0)
     {
         for (int i = 0; i < tagsFromModel.Count; i++)
@@ -44,7 +44,7 @@
     }
 </div>
 
-<div id="inputContainer" hidden>
+<div id="inputTagContainer" hidden>
     @foreach (var id in Model)
     {
         <input name="TagIds" value="@id" />
@@ -54,7 +54,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Выберите теги</h5>
+                <h5 class="modal-title">Выберите теги</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="mBody" class="modal-body">

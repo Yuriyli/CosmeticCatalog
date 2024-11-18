@@ -1,0 +1,14 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "Продукт создан";
+}
+<div style="text-align:center;">
+    <card title="Новый продукт @("\"" + @Model.Name + "\"") успешно создан">
+        <form method="get" asp-area="Moderator" asp-controller="Create" asp-action="Product">
+            <button type="submit" class="btn btn-primary m-1" data-bs-dismiss="modal">Создать еще</button>
+        </form>
+        <form method="get" asp-area="Moderator" asp-controller="List" asp-action="Product">
+            <button type="submit" class="btn btn-primary m-1">Перейти к спику продуктов</button>
+        </form>
+    </card>
+</div>

@@ -207,9 +207,11 @@ namespace CosmeticCatalog.Areas.Moderator.Controllers
         #region Product
 
         [Route("{area}/{controller}/Product")]
-        public IActionResult Product()
+        public async Task<IActionResult> ProductAsync(int id)
         {
-            return View();
+            var result = await _moderator.GetProductEditVMAsync(id);
+            if(result == null) return new NotFoundResult();
+            return View(result);
         }
 
         #endregion

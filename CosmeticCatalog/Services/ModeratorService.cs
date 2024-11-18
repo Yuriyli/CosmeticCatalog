@@ -118,7 +118,7 @@ namespace CosmeticCatalog.Services
                 }
 
                 originalCategory.Name = category.Name;
-                originalCategory.ParentId = category.ParentId;                                
+                originalCategory.ParentId = category.ParentId;
 
                 var mod = new CategoryModification()
                 {
@@ -481,6 +481,34 @@ namespace CosmeticCatalog.Services
                 .Include(p => p.Tags)
                 .Include(p => p.Modifications)
                 .FirstOrDefaultAsync(p => p.Id == productId);
+            return result;
+        }
+
+        /// <summary>
+        /// Получить модель для редактирования продукта из БД
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        public async Task<ProductEditVM?> GetProductEditVMAsync(int productId)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+            if (product == null) return null;
+
+            var result = new ProductEditVM
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                ParentId = product.CategoryId
+            };
+            foreach (var c in product.Components)
+            {
+                result.ComponentIds.Add(c.Id);
+            }
+            foreach (var t in product.Tags)
+            {
+                result.TagIds.Add(t.Id);
+            }
             return result;
         }
 
